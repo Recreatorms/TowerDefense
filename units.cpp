@@ -1,11 +1,12 @@
 #include "units.h"
 
-Unit::Unit(QObject *parent) :
-    QObject(parent)
+
+Unit::Unit(QObject *parent, QPointF _start) :
+  QObject(parent)
 {
 
-    setPos(-250,-85);
-    angle = 90;
+    setPos(_start);
+    angle = 0;
     setRotation(angle);
 }
 
@@ -20,42 +21,51 @@ QRectF Unit::boundingRect() const
 void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QPolygon polygon;
-    polygon << QPoint(-10, -10) <<  QPoint(-10, 10) << QPoint(10, 10) << QPoint(10,-10) << QPoint(0,-40);
+    polygon << QPoint(-10, -10) <<  QPoint(-10, 10) << QPoint(10, 10) << QPoint(10,-10);// << QPoint(0,-40);
     painter->setBrush(Qt::red);
     painter->drawPolygon(polygon);
     Q_UNUSED(option)
     Q_UNUSED(widget)
 }
 
-void Unit::gameTimerSlot() {
-
-   moveTo(QPoint(0,-85));
 
 
-// границы
-  if (this->x() - 10 < -250) {
-        this->setX(-240);
-   }
-  if (this->x() + 10 > 250) {
-        this->setX(240);
-   }
-  if (this->y() - 10 < -250) {
-        this->setY(-240);
-   }
-  if (this->y() + 10 > 250) {
-        this->setY(240);
-   }
 
+
+
+void Unit::moveTo(QPointF point) {
+
+  // границы
+//    if (this->x() - 10 < -250) {
+//          this->setX(-240);
+//     }
+//    if (this->x() + 10 > 250) {
+//          this->setX(240);
+//     }
+//    if (this->y() - 10 < -250) {
+//          this->setY(-240);
+//     }
+//    if (this->y() + 10 > 250) {
+//          this->setY(240);
+//     }
+
+    if (x() < point.x() && y() == point.y()) //right
+        setPos(mapToScene(1,0));
+    if (x() == point.x() && y() < point.y()) //down
+        setPos(mapToScene(0,1));
+
+//    if (x() > point.x() && y() == point.y()) //left
+//        setPos(mapToScene(-1,0));
+//    if (x() == point.x() && y() > point.y()) //up
+//        setPos(mapToScene(0,-1));
 }
 
-void Unit::moveTo(QPoint point) {
-
-    if (pos() != point)
-        setPos(mapToParent(0,-1));
-    else if(angle != 180) {
-        angle +=1;
-        this->setRotation(angle);
-    }
+void Unit::completePath(std::vector<QPointF> path) {
+//  for (int i = 0; i < path.size(); i++) {
+//    while (pos() != path[i]) {
+//          moveTo(path[i]);
+//    }
+//  }
 }
 
 //void Unit::setPosition(const QPointF &pos, Background *back){

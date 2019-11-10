@@ -1,9 +1,8 @@
 #include "background.h"
 
-Background::Background(QObject *parent) :
-  QObject(parent)
+Background::Background()
 {
-  scene = new QGraphicsScene();
+  this->scene = new QGraphicsScene();
 
 }
 
@@ -35,9 +34,8 @@ void Background::makeChanges() {
             QPointF pos1(-square/2*m+j*square, -square/2*n+i*square);
             if (map[i][j] == 1)
             //    getItem(pos1)->setOpacity(0.0);
-            scene->removeItem(getItem(j,i));
+            this->scene->removeItem(getItem(j,i));
         }
-    getItem(2,4)->setOpacity(0.1);
 //         scene->itemAt(pos1, trans)->setOpacity(0.1);
 //         QPaintDevice *device;
 //         QPainter *painter;
@@ -47,17 +45,97 @@ void Background::makeChanges() {
 
 }
 QGraphicsItem* Background::getItem(int x, int y) {
-    QPointF pos(-square/2*m + x*square, -square/2*n +y*square);
+  QPointF pos1(-square/2*m + x*square, -square/2*n +y*square);
   for (qreal i = 0; i < square*n; i+=square) // потом поменять на int
     for (qreal j = 0; j < square*m; j +=square) {
         QPointF pos2(-square/2*m+j, -square/2*n+i);
-    if (pos == pos2) {
+    if (pos1 == pos2) {
         QTransform trans;
-        return scene->itemAt(pos, trans);
+        return scene->itemAt(pos1, trans);
       }
   }
   return nullptr;
 }
 
+void Background::gameTimerSlot() {
+ // units[0]->completePath(path);
+ for (int i = 0; i < path.size(); i++)
+   if (units[0]->pos() != path[i])
+          units[0]->moveTo(path[i]);
 
+
+  if(units[0]->pos() == end)
+    units[0]->~Unit();
+
+}
+
+void Background::setStartEndPos() {
+  for (size_t i = 0; i < n; i++)
+    for (size_t j = 0; j < m; j++) {
+      if (map[i][j] == 2) {
+          start = QPointF(-square/2*(m-1) +j*square,-square/2*(n-1) +i*square);
+          getItem(j,i)->setOpacity(0.2);
+      }
+      if (map[i][j] == 3) {
+          end = QPointF(-square/2*(m-1) +j*square,-square/2*(n-1) +i*square);
+          getItem(j,i)->setOpacity(0.2);
+      }
+    }
+}
+
+void Background::makePath(QPointF currentPoint) {
+  path.push_back(currentPoint);
+        size_t x = currentPoint.x()/square + m/2,
+            y = currentPoint.y()/square + m/2;
+        QPointF newPoint(currentPoint);
+        if (x+1 <m) { // right
+            if(map[y][x+1] == 1 || map[y][x+1] == 3) {
+              if (!path.contains(QPointF(currentPoint.x() +square,currentPoint.y()))) {
+                 newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
+                 if (newPoint != end)
+                    makePath(newPoint);
+                 else path.push_back(newPoint);}
+              }
+           }
+        if(x-1 >0) { // left
+            if(map[y][x-1] == 1 || map[y][x-1] == 3) {
+              if (!path.contains(QPointF(currentPoint.x() -square,currentPoint.y()))) {
+                 newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
+                 if (newPoint != end)
+                    makePath(newPoint);
+                 else path.push_back(newPoint);}
+              }
+           }
+        if(y+1 <m) { // down
+            if(map[y+1][x] == 1 || map[y+1][x] == 3) {
+              if (!path.contains(QPointF(currentPoint.x(),currentPoint.y()+square))) {
+                 newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
+                 if (newPoint != end)
+                    makePath(newPoint);
+                 else path.push_back(newPoint);}
+              }
+           }
+        if(y-1 > 0) { // up
+            if(map[y-1][x] == 1 || map[y-1][x] == 3) {
+              if (!path.contains(QPointF(currentPoint.x(),currentPoint.y()-square))) {
+                 newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
+                 if (newPoint != end)
+                    makePath(newPoint);
+                 else path.push_back(newPoint);}
+              }
+        }
+}
+
+
+
+void Background::addUnit() {
+
+  Unit *unit = new Unit(this, start);
+  this->scene->addItem(unit);
+  units.push_back(unit);
+}
+
+//Unit* Background::getUnit(int x, int y) {
+
+//}
 

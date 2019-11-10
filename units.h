@@ -6,30 +6,26 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QPainter>
+#include <queue>
 #include <windows.h>
-#include "background.h"
 
 
 class Unit : public QObject, public QGraphicsItem
 {
-    Q_OBJECT
+ Q_OBJECT
 public:
-    explicit Unit(QObject *parent = nullptr);
-    ~Unit() override;
+    explicit Unit(QObject *parent, QPointF _start);
+    ~Unit();
  //   void setPosition(const QPointF &pos, Background *back);
-    void moveTo(QPoint point);
-
-signals:
-public slots:
-  void gameTimerSlot();
+    void moveTo(QPointF point);
+    void completePath(std::vector<QPointF> path);
 protected:
-    QRectF boundingRect() const override;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 private:
     QGraphicsItem *item;
     int hp;
     qreal angle;
-    QPoint position;
     QLabel *label;
 };
 

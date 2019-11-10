@@ -25,7 +25,6 @@ public:
 public slots:
 private:
   Ui::MainWindow * ui;
-  Unit           * unit;
   QTimer         * timer;
   Background     * background;
  // Background *background;
