@@ -6,7 +6,7 @@
 struct tower {
     int damage;
     int attackSpeed;
-    int radius;
+    int angle;
     bool canSpawn;
 
     int x, y;

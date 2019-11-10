@@ -3,7 +3,9 @@
 Unit::Unit(QObject *parent) :
     QObject(parent)
 {
-    angle = 0;
+
+    setPos(-250,-85);
+    angle = 90;
     setRotation(angle);
 }
 
@@ -26,22 +28,11 @@ void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 }
 
 void Unit::gameTimerSlot() {
-  //qreal angle = triangle->getAngle()
-  if (GetAsyncKeyState(VK_LEFT)){
-        angle -=10;
-      setRotation(angle);
-  }
-  if (GetAsyncKeyState(VK_RIGHT)){
-        angle += 10;
-        setRotation(angle);
-  }
-  if (GetAsyncKeyState(VK_UP)){
-        setPos(mapToParent(0, -5));
-   }
-  if (GetAsyncKeyState(VK_DOWN)){
-        setPos(mapToParent(0, 5));
-  }
 
+   moveTo(QPoint(0,-85));
+
+
+// границы
   if (this->x() - 10 < -250) {
         this->setX(-240);
    }
@@ -55,6 +46,16 @@ void Unit::gameTimerSlot() {
         this->setY(240);
    }
 
+}
+
+void Unit::moveTo(QPoint point) {
+
+    if (pos() != point)
+        setPos(mapToParent(0,-1));
+    else if(angle != 180) {
+        angle +=1;
+        this->setRotation(angle);
+    }
 }
 
 //void Unit::setPosition(const QPointF &pos, Background *back){

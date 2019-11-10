@@ -6,6 +6,11 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+
+const qreal square = 100; // размер одного квадрата
+                      // 100x100 pixels
+
+
 class Background : public QObject
 {
   Q_OBJECT
@@ -17,18 +22,18 @@ public:
       return scene;
     }
 
-    std::vector<std::vector<int> > map;
-    void fillMap(size_t _n, size_t _m, std::vector<std::vector<int> > p) {
-      n = _n;
-      m = _m;
-      map = std::move(p);
-    }
-    QGraphicsItem* getItem(QPointF &pos);
+    void fillMap(size_t _n, size_t _m, std::vector<std::vector<int> > p);
+    void makeChanges();
+    QGraphicsItem* getItem(int x, int y);
     void createMap();
-private:
+
+    std::vector<std::vector<int> > map;
+
     size_t n;      // число строк
     size_t m ;     // число столбиков
-    qreal square; // размер одного квадрата
+  //  qreal square; // размер одного квадрата
+
+private:
     QGraphicsScene *scene;
 };
 
