@@ -6,6 +6,7 @@ Unit::Unit(QObject *parent, QPointF _start) :
 {
 
     setPos(_start);
+    currentPos = 0;
     angle = 0;
     setRotation(angle);
 }
@@ -55,10 +56,13 @@ void Unit::moveTo(QPointF point) {
         setPos(mapToScene(1,0));
     else if (x() > point.x() && y() == point.y()) //left
         setPos(mapToScene(-1,0));
-    if (x() == point.x() && y() > point.y()) //up
-        setPos(mapToScene(0,-1));
-    else if (x() == point.x() && y() < point.y()) //down
+    if (x() == point.x() && y() < point.y()) //down
         setPos(mapToScene(0,1));
+    else if (x() == point.x() && y() > point.y()) //up
+        setPos(mapToScene(0,-1));
+    if (pos() == point) {
+        currentPos++;
+    }
 }
 
 //void Unit::completePath(std::vector<QPointF> path) {

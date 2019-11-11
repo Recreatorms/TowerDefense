@@ -58,14 +58,16 @@ QGraphicsItem* Background::getItem(size_t x, size_t y) {
 }
 
 void Background::gameTimerSlot() { // путь строится правильно,  но перемещение сделано не правильно
- // units[0]->completePath(path);
-  for (int i = 1; i < path.size(); i++)
-    //if (units[0]->pos() != path[i])
-      units[0]->moveTo(path[i]);
+  for (int i = 0; i < units.size(); i++) {
+    if(units[i]->currentPos == path.size()-2)
+        units[i]->moveTo(path[path.size()-1]);
+    else if (units[i]->pos() != path[units[i]->currentPos +1])
+          units[i]->moveTo(path[units[i]->currentPos]);
 
-  if(units[0]->pos() == end)
-    units[0]->~Unit();
+    if(units[i]->pos() == end)
+        units[i]->~Unit();
 
+  }
 }
 
 void Background::setStartEndPos() {

@@ -25,16 +25,19 @@ MainWindow::MainWindow(QWidget *parent)
   ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  size_t n = 6, m = 6;
+  size_t n = 8, m = 8;
   std::vector<std::vector<int> > p = /*(n, std::vector<int> (m));*/
   {
-        {0, 0, 0, 3, 1, 0},
-        {2, 1, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1, 0},
-        {0, 0, 1, 0, 1, 0},
-        {0, 0, 1, 1, 1, 0}
+        {0, 0, 0, 1, 1, 1, 0, 0},
+        {2, 1, 0, 1, 0, 1, 1, 1},
+        {0, 1, 0, 1, 0, 0, 0, 1},
+        {0, 1, 0, 1, 0, 1, 1, 1},
+        {0, 1, 0, 1, 0, 1, 0, 0},
+        {0, 1, 0, 1, 0, 1, 1, 1},
+        {0, 1, 1, 1, 0, 0, 0, 1},
+        {0, 0, 0, 0, 0, 3, 1, 1}
   };
+  int numberOfUnits = 3;
 //  // теперь можно заполнить двумерный массив (вектор векторов)
   background->fillMap(n,m,p);
 
@@ -43,9 +46,12 @@ MainWindow::MainWindow(QWidget *parent)
 
   background->setStartEndPos();
   background->makePath(background->start);
-  background->addUnit();
   timer = new QTimer();  // почти самая важная штука, иначе ничего не будет происходить
-  connect(timer, &QTimer::timeout, background, &Background::gameTimerSlot);
+  for (int i = 0; i < numberOfUnits; i++) {
+      background->addUnit();
+      connect(timer, &QTimer::timeout, background, &Background::gameTimerSlot);
+      Sleep(1000);
+  }
 
   timer->start(1000/80); // это важно
 
