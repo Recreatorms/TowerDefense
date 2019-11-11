@@ -18,7 +18,7 @@ public:
     ~Unit();
  //   void setPosition(const QPointF &pos, Background *back);
     void moveTo(QPointF point);
-    void completePath(std::vector<QPointF> path);
+ //   void completePath(std::vector<QPointF> path);
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

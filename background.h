@@ -31,7 +31,7 @@ public:
 
     void addUnit();
 
-    QGraphicsItem* getItem(int x, int y);
+    QGraphicsItem* getItem(size_t x, size_t y);
    // Unit* getUnit(int x, int y);
 
     std::vector<std::vector<int> > map;

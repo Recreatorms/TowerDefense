@@ -44,7 +44,7 @@ void Background::makeChanges() {
 //         painter->setBrush(Qt::green);
 
 }
-QGraphicsItem* Background::getItem(int x, int y) {
+QGraphicsItem* Background::getItem(size_t x, size_t y) {
   QPointF pos1(-square/2*m + x*square, -square/2*n +y*square);
   for (qreal i = 0; i < square*n; i+=square) // потом поменять на int
     for (qreal j = 0; j < square*m; j +=square) {
@@ -57,12 +57,11 @@ QGraphicsItem* Background::getItem(int x, int y) {
   return nullptr;
 }
 
-void Background::gameTimerSlot() {
+void Background::gameTimerSlot() { // путь строится правильно,  но перемещение сделано не правильно
  // units[0]->completePath(path);
- for (int i = 0; i < path.size(); i++)
-   if (units[0]->pos() != path[i])
-          units[0]->moveTo(path[i]);
-
+  for (int i = 1; i < path.size(); i++)
+    //if (units[0]->pos() != path[i])
+      units[0]->moveTo(path[i]);
 
   if(units[0]->pos() == end)
     units[0]->~Unit();
@@ -83,47 +82,45 @@ void Background::setStartEndPos() {
     }
 }
 
-void Background::makePath(QPointF currentPoint) {
+void Background::makePath(QPointF currentPoint) { // путь строится правильно,  но перемещение сделано не правильно
   path.push_back(currentPoint);
-        size_t x = currentPoint.x()/square + m/2,
-            y = currentPoint.y()/square + m/2;
-        QPointF newPoint(currentPoint);
-        if (x+1 <m) { // right
+  if (currentPoint != end) {
+        size_t x = currentPoint.x()/square + m/2,  // столбик
+            y = currentPoint.y()/square + m/2;     // строка
+        QPointF newPoint;
+        if (x!=m-1) { // right
             if(map[y][x+1] == 1 || map[y][x+1] == 3) {
-              if (!path.contains(QPointF(currentPoint.x() +square,currentPoint.y()))) {
-                 newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
-                 if (newPoint != end)
+              newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
+              if (!path.contains(newPoint))
+                 //if (newPoint != end)
                     makePath(newPoint);
-                 else path.push_back(newPoint);}
-              }
-           }
-        if(x-1 >0) { // left
-            if(map[y][x-1] == 1 || map[y][x-1] == 3) {
-              if (!path.contains(QPointF(currentPoint.x() -square,currentPoint.y()))) {
-                 newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
-                 if (newPoint != end)
-                    makePath(newPoint);
-                 else path.push_back(newPoint);}
-              }
-           }
-        if(y+1 <m) { // down
-            if(map[y+1][x] == 1 || map[y+1][x] == 3) {
-              if (!path.contains(QPointF(currentPoint.x(),currentPoint.y()+square))) {
-                 newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
-                 if (newPoint != end)
-                    makePath(newPoint);
-                 else path.push_back(newPoint);}
-              }
-           }
-        if(y-1 > 0) { // up
-            if(map[y-1][x] == 1 || map[y-1][x] == 3) {
-              if (!path.contains(QPointF(currentPoint.x(),currentPoint.y()-square))) {
-                 newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
-                 if (newPoint != end)
-                    makePath(newPoint);
-                 else path.push_back(newPoint);}
               }
         }
+        if(x!=0) { // left
+            if(map[y][x-1] == 1 || map[y][x-1] == 3) {
+              newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
+             if (!path.contains(newPoint))
+                 //if (newPoint != end)
+                    makePath(newPoint);
+            }
+        }
+        if(y!=m-1) { // down
+            if(map[y+1][x] == 1 || map[y+1][x] == 3) {
+              newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
+              if (!path.contains(newPoint))
+                // if (newPoint != end)
+                   makePath(newPoint);
+              }
+        }
+        if(y!=0) { // up
+            if(map[y-1][x] == 1 || map[y-1][x] == 3) {
+              newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
+              if (!path.contains(newPoint))
+                // if (newPoint != end)
+                    makePath(newPoint);
+              }
+        }
+    }
 }
 
 
