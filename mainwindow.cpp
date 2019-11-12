@@ -26,34 +26,34 @@ MainWindow::MainWindow(QWidget *parent)
   ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   size_t n = 8, m = 8;
-  std::vector<std::vector<int> > p = /*(n, std::vector<int> (m));*/
+  std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
   {
-        {0, 0, 0, 1, 1, 1, 0, 0},
-        {2, 1, 0, 1, 0, 1, 1, 1},
-        {0, 1, 0, 1, 0, 0, 0, 1},
-        {0, 1, 0, 1, 0, 1, 1, 1},
-        {0, 1, 0, 1, 0, 1, 0, 0},
-        {0, 1, 0, 1, 0, 1, 1, 1},
-        {0, 1, 1, 1, 0, 0, 0, 1},
-        {0, 0, 0, 0, 0, 3, 1, 1}
+        {'b', 'b', 'b', 'b', 'b', 'r', 'b', 'b'},
+        {'s', 'r', 'b', 'b', 'b', 'r', 'r', 'r'},
+        {'b', 'r', 'b', 'b', 'b', 'b', 'r', 'b'},
+        {'b', 'r', 'r', 'r', 'r', 'b', 'r', 'b'},
+        {'b', 'b', 'b', 'b', 'r', 'b', 'r', 'b'},
+        {'b', 'b', 'b', 'b', 'r', 'b', 'r', 'b'},
+        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 'b'},
+        {'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'}
   };
-  int numberOfUnits = 3;
+  size_t numberOfUnits = 100;
 //  // теперь можно заполнить двумерный массив (вектор векторов)
   background->fillMap(n,m,p);
 
   background->createMap(); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
-  background->makeChanges();
+  ///background->makeChanges();
 
-  background->setStartEndPos();
-  background->makePath(background->start);
-  timer = new QTimer();  // почти самая важная штука, иначе ничего не будет происходить
-  for (int i = 0; i < numberOfUnits; i++) {
-      background->addUnit();
-      connect(timer, &QTimer::timeout, background, &Background::gameTimerSlot);
-      Sleep(1000);
-  }
+  background->setGameOptions(numberOfUnits);
+ // background->makePath(background->start);
+  background->makeWavePath();
+  timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
+  spawnTimer = new QTimer();
+  connect(spawnTimer, &QTimer::timeout, background, &Background::spawnUnit);
+  connect(timer, &QTimer::timeout, background, &Background::gameTimerSlot);
+  timer->start(1000/160); // это важно
+  spawnTimer->start(500);
 
-  timer->start(1000/80); // это важно
 
 }
 
