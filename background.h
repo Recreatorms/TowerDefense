@@ -15,6 +15,7 @@
 
 #include "units.h"
 #include "tile.h"
+#include "towers.h"
 
 const qreal square = 100; // размер одного квадрата
                      // 100x100 pixels
@@ -34,6 +35,7 @@ public:
 
     void addTile(QPointF pos1, QPointF pos2, QBrush brush, QPen pen);
     void addUnit();
+    void addTower(QPointF pos1, QPointF pos2, QBrush brush, QPen pen, int radius);
 
     void makeWavePath();
     bool waveCompleted();

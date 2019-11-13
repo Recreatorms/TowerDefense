@@ -7,7 +7,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <queue>
-#include <windows.h>
 
 
 class Unit : public QObject, public QGraphicsItem

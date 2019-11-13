@@ -83,8 +83,8 @@ QGraphicsItem* Background::getItem(size_t x, size_t y) {
 
 
 void Background::addTile(QPointF pos1, QPointF pos2, QBrush brush, QPen pen) {
-    Tile *tile = new Tile(this, pos1, pos2, brush, pen);
-    this->addItem(tile);
+  Tile *tile = new Tile(this, pos1, pos2, brush, pen);
+  this->addItem(tile);
 }
 
 void Background::addUnit() {
@@ -92,6 +92,11 @@ void Background::addUnit() {
   Unit *unit = new Unit(this, start);
   this->addItem(unit);
   units.push_back(unit);
+}
+
+void Background::addTower(QPointF pos1, QPointF pos2, QBrush brush, QPen pen, int radius) {
+  Tower *tower = new Tower(this, pos1, pos2, brush, pen, radius);
+  this->addItem(tower);
 }
 
 void Background::spawnUnit()
@@ -194,18 +199,18 @@ void Background::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     // Выбрать определенный тайл
     if (mouseEvent->scenePos().x() >= square*(width+1)/2 && mouseEvent->scenePos().x() <= square*(width+10)/2 &&
         mouseEvent->scenePos().y() >= -square*height/2 && mouseEvent->scenePos().y() <= square*height/2) {
-        addUnit();
         selectingMode = true;
     }
     if (selectingMode)
     for (int i = 0; i < height; i++)
         for (int j = 0; j < width; j++)
                     if (map[i][j] == 'b') {
-//                        QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
-//                                pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
-                        if (mouseEvent->scenePos().x() >= (-square/2*width + j*square) && mouseEvent->scenePos().x() <= (-square/2*(width-2) + j*square) &&
-                            mouseEvent->scenePos().y() >= (-square/2*height+i*square) && mouseEvent->scenePos().y() <= (-square/2*(height-2)+i*square)) {
-                                addUnit();
+                        QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
+                                pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
+                        if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
+                            mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
+                                addTower(pos1,pos2, QBrush(Qt::black,Qt::SolidPattern), Qt::SolidLine, square);
+                                selectingMode = false;
                                 break;
                             }
                     }

@@ -1,16 +1,38 @@
 #ifndef TOWERS_H
 #define TOWERS_H
 
-#include <QLabel>
+#include <QObject>
+#include <QGraphicsItem>
+#include <QTimer>
+#include <QPainter>
+#include <QBrush>
+#include <QPen>
 
-struct tower {
-    int damage;
-    int attackSpeed;
-    int angle;
-    bool canSpawn;
+class Tower : public QObject, public QGraphicsItem
+{
+      Q_OBJECT
+public:
+    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QBrush _brush, QPen _pen, int radius);
+    ~Tower();
 
-    int x, y;
-    QLabel *label;
+
+//    void attack();
+//    void showRadius();
+//    void buyTower();
+//    void sellTower();
+
+
+//    int damage;
+//    int attackSpeed;
+//    int attackRadius;
+protected:
+    QRectF boundingRect() const;
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
+private:
+    QBrush brush;
+    QPen pen;
+    QPointF pos1, pos2;
+    int radius;
 };
 
 #endif // TOWERS_H

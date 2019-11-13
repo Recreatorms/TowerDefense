@@ -6,8 +6,7 @@
 #include <QTimer>
 
 #include "background.h"
-#include "towers.h"
-#include "units.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

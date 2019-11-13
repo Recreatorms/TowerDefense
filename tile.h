@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QBrush>
+
 class Tile: public QObject, public QGraphicsItem
 {
          Q_OBJECT
