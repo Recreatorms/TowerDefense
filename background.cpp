@@ -1,95 +1,141 @@
 #include "background.h"
 
-Background::Background()
-{
-  this->scene = new QGraphicsScene();
+Background::Background() : QGraphicsScene() {
 //  QBrush *ibrush = new QBrush;
 //  ibrush->setTextureImage(QImage(":/images/Sprite_FX_Grass_0001"));
-
-//  scene->drawBackground();
+//  scene->drawBackground(ibrush);
 }
 
 Background::~Background() {
 }
 
-void Background::createMap() {
-  scene->setSceneRect(-square/2, -square/2, square, square);
-  for (qreal i = 0; i < square*n; i+=square) // потом поменять на int
-    for (qreal j = 0; j < square*m; j +=square) {
-        QPointF pos1(-square/2*m+j, -square/2*n+i),
-                pos2(-square/2*(m-2)+j,-square/2*(n-2)+i);
-        QColor color;
-        if (map[i/square][j/square] == 'b')
-          color = Qt::green;
-        if (map[i/square][j/square] == 'r')
-          color = Qt::yellow;
-        if (map[i/square][j/square] == 'e' || map[i/square][j/square] == 's')
-          color = Qt::gray;
-        scene->addRect(QRectF(pos1,pos2), QPen(Qt::black), QBrush(color, Qt::DiagCrossPattern));
+void Background::fillMap(size_t _height, size_t _width, std::vector<std::vector<char> > p) {
+    map = std::move(p);
+    height = _height;
+    width =  _width;
+}
 
+void Background::createMap() {
+  this->setSceneRect(-square/2, -square/2, square, square);
+  for (size_t i = 0; i < height; i++) // потом поменять на int
+    for (size_t j = 0; j < width; j++) {
+        QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
+                pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
+        QColor color;
+        QPen pen;
+        QBrush brush;
+        if (map[i][j] == 'b') {
+          color = Qt::green;
+          pen = Qt::SolidLine;
+        }
+        if (map[i][j] == 'r') {
+          color = Qt::yellow;
+          pen = Qt::NoPen;
+        }
+        if (map[i][j] == 'e' || map[i][j] == 's') {
+          color = Qt::gray;
+          pen = Qt::NoPen;
+        }
+        brush = QBrush(color, Qt::DiagCrossPattern);
+       // QBrush brush(color, Qt::DiagCrossPattern);
+//        this->addRect(QRectF(pos1,pos2), pen, brush);
+        this->addTile(pos1, pos2, brush, pen);
 
     }
 }
 
-void Background::fillMap(size_t _n, size_t _m, std::vector<std::vector<char> > p) {
-    n = _n;
-    m = _m;
-    map = std::move(p);
+void Background::setGameOptions(size_t _number) {
+  for (size_t i = 0; i < height; i++)
+    for (size_t j = 0; j < width; j++) {
+      if (map[i][j] == 's') {
+          start = QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square);
+          getItem(j,i)->setOpacity(0.2);
+      }
+      if (map[i][j] == 'e') {
+          end = QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square);
+          getItem(j,i)->setOpacity(0.2);
+      }
+    }
+  numberOfUnitsToSpawn = _number;
 }
 
 
-void Background::makeChanges() {
-    for (qreal i = 0; i < n; i++)
-        for (qreal j = 0; j < m; j++) {
-            QPointF pos1(-square/2*m+j*square, -square/2*n+i*square);
-            if (map[i][j] == 'r')
-            //    getItem(pos1)->setOpacity(0.0);
-               this->scene->removeItem(getItem(j,i));
-        }
-//         scene->itemAt(pos1, trans)->setOpacity(0.1);
-//         QPaintDevice *device;
-//         QPainter *painter;
-//         painter->begin(device);
-//         QStyleOptionGraphicsItem *option;
-//         painter->setBrush(Qt::green);
+void Background::addInterface() {
+    this->addRect(QRectF(QPointF(square*(width+1)/2,-square*(height)/2),QPointF(square*(width+10)/2,square*(height)/2)), QPen(Qt::black), Qt::NoBrush);
 
 }
 
-void Background::makeWavePath()
+QGraphicsItem* Background::getItem(size_t x, size_t y) {
+  QPointF pos1(-square/2*width + x*square, -square/2*height +y*square);
+  for (qreal i = 0; i < square*height; i+=square) // потом поменять на int
+    for (qreal j = 0; j < square*width; j +=square) {
+        QPointF pos2(-square/2*width+j, -square/2*height+i);
+    if (pos1 == pos2) {
+        QTransform trans;
+        QGraphicsItem* item = this->itemAt(pos1, trans);
+        if (item != nullptr)
+            return item;
+      }
+    }
+  return nullptr;
+}
+
+
+
+void Background::addTile(QPointF pos1, QPointF pos2, QBrush brush, QPen pen) {
+    Tile *tile = new Tile(this, pos1, pos2, brush, pen);
+    this->addItem(tile);
+}
+
+void Background::addUnit() {
+
+  Unit *unit = new Unit(this, start);
+  this->addItem(unit);
+  units.push_back(unit);
+}
+
+void Background::spawnUnit()
 {
-    std::vector<std::vector<int> > labyrinth (n, std::vector<int> (m));
-    for(size_t i = 0; i < n; i++)
-        for (size_t j = 0; j < m; j++)
+  if (units.size() != numberOfUnitsToSpawn && numberOfUnitsToSpawn != 0)
+      this->addUnit();
+  else numberOfUnitsToSpawn = 0;
+}
+
+void Background::makeWavePath() {
+    const int WALL   = -1;
+    const int BLANK  = -2;
+    std::vector<std::vector<int> > labyrinth (height, std::vector<int> (width));
+    for(size_t i = 0; i < height; i++)
+        for (size_t j = 0; j < width; j++)
           if (map[i][j] == 'b')
               labyrinth[i][j] = WALL;
             else if (map[i][j] == 'r' || map[i][j] == 'e')
               labyrinth[i][j] = BLANK;
   ///////
-      int ay = start.y()/square + m/2,
-          ax = start.x()/square + m/2,
-          by = end.y()/square + m/2,
-          bx = end.x()/square + m/2;
+      int ay = start.y()/square + height/2,
+          ax = start.x()/square + width/2,
+          by = end.y()/square + height/2,
+          bx = end.x()/square + width/2;
       int dx[4] = {1, 0, -1, 0};   // смещения, соответствующие соседям ячейки
       int dy[4] = {0, 1, 0, -1};   // справа, снизу, слева и сверху
       int d, x, y, k;
       bool stop;
 
-      ///if (labyrinth[ay][ax] == WALL || labyrinth[by][bx] == WALL) return false;  // ячейка (ax, ay) или (bx, by) - стена
 
       // распространение волны
       d = 0;
       labyrinth[ay][ax] = 0;            // стартовая ячейка помечена 0
       do {
         stop = true;               // предполагаем, что все свободные клетки уже помечены
-        for (y = 0; y < H; ++y)
-          for (x = 0; x < W; ++x)
+        for (y = 0; y < height; ++y)
+          for (x = 0; x < width; ++x)
             if (labyrinth[y][x] == d)                         // ячейка (x, y) помечена числом d
             {
               for ( k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
               {
                  int iy = y + dy[k],
                      ix = x + dx[k];
-                 if (iy >= 0 && iy < H && ix >= 0 && ix < W && labyrinth[iy][ix] == BLANK)
+                 if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == BLANK)
                  {
                     stop = false;              // найдены непомеченные клетки
                     labyrinth[iy][ix] = d + 1;      // распространяем волну
@@ -99,51 +145,27 @@ void Background::makeWavePath()
         d++;
       } while ( !stop && labyrinth[by][bx] == BLANK );
 
-      //if (labyrinth[by][bx] == BLANK) return false;  // путь не найден
 
       // восстановление пути
-      int len = labyrinth[by][bx];            // длина кратчайшего пути из (ax, ay) в (bx, by)
+      d = labyrinth[by][bx];            // длина кратчайшего пути из (ax, ay) в (bx, by)
       x = bx;
       y = by;
-      d = len;
       while ( d > 0 ) {
-        path.push_front(QPointF(x*square - square*(m-1)/2, y*square - (m-1) * square/2));                   // записываем ячейку (x, y) в путь
+        path.push_front(QPointF(x*square - square*(width-1)/2, y*square - (height-1) * square/2));                   // записываем ячейку (x, y) в путь
         d--;
         for (k = 0; k < 4; ++k) {
            int iy = y + dy[k],
                ix = x + dx[k];
-           if (iy >= 0 && iy < H && ix >= 0 && ix < W && labyrinth[iy][ix] == d) {
+           if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == d) {
               x = x + dx[k];
               y = y + dy[k];           // переходим в ячейку, которая на 1 ближе к старту
               break;
           }
         }
       }
-      path.push_front(QPointF(ax*square - square*(m-1)/2, ay*square - (m-1) * square/2));        // теперь px[0..len] и py[0..len] - координаты ячеек пути
-      //return true;
+      path.push_front(QPointF(ax*square - square*(width-1)/2, ay*square - (height-1) * square/2));        // теперь px[0..len] и py[0..len] - координаты ячеек пути
     }
 
-
-bool Background::waveCompleted() {
-  if (numberOfUnits == 0)
-    return true;
-  else
-    return false;
-}
-QGraphicsItem* Background::getItem(size_t x, size_t y) {
-  QPointF pos1(-square/2*m + x*square, -square/2*n +y*square);
-  for (qreal i = 0; i < square*n; i+=square) // потом поменять на int
-    for (qreal j = 0; j < square*m; j +=square) {
-        QPointF pos2(-square/2*m+j, -square/2*n+i);
-    if (pos1 == pos2) {
-        QTransform trans;
-        QGraphicsItem* item = scene->itemAt(pos1, trans);
-        if (item != nullptr)
-            return item;
-      }
-  }
-  return nullptr;
-}
 
 void Background::gameTimerSlot() { // путь строится правильно,  но перемещение сделано не правильно
   for (size_t i = 0; i < units.size(); i++) {
@@ -162,77 +184,90 @@ void Background::gameTimerSlot() { // путь строится правильн
     }
 }
 
-void Background::spawnUnit()
+//void Background::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+//{
+//   // mouseEvent->pos()(
+//}
+
+void Background::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (units.size() != numberOfUnits && numberOfUnits != 0)
-      this->addUnit();
- // else numberOfUnits = 0;
-}
-
-void Background::setGameOptions(size_t _number) {
-  for (size_t i = 0; i < n; i++)
-    for (size_t j = 0; j < m; j++) {
-      if (map[i][j] == 's') {
-          start = QPointF(-square/2*(m-1) +j*square,-square/2*(n-1) +i*square);
-          getItem(j,i)->setOpacity(0.2);
-      }
-      if (map[i][j] == 'e') {
-          end = QPointF(-square/2*(m-1) +j*square,-square/2*(n-1) +i*square);
-          getItem(j,i)->setOpacity(0.2);
-      }
+    // Выбрать определенный тайл
+    if (mouseEvent->scenePos().x() >= square*(width+1)/2 && mouseEvent->scenePos().x() <= square*(width+10)/2 &&
+        mouseEvent->scenePos().y() >= -square*height/2 && mouseEvent->scenePos().y() <= square*height/2) {
+        addUnit();
+        selectingMode = true;
     }
-  numberOfUnits = _number;
-}
+    if (selectingMode)
+    for (int i = 0; i < height; i++)
+        for (int j = 0; j < width; j++)
+                    if (map[i][j] == 'b') {
+//                        QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
+//                                pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
+                        if (mouseEvent->scenePos().x() >= (-square/2*width + j*square) && mouseEvent->scenePos().x() <= (-square/2*(width-2) + j*square) &&
+                            mouseEvent->scenePos().y() >= (-square/2*height+i*square) && mouseEvent->scenePos().y() <= (-square/2*(height-2)+i*square)) {
+                                addUnit();
+                                break;
+                            }
+                    }
+    // Выбрать башню для постройки
+    // QPointF(square*(width+1)/2,-square*(height)/2),
+    // QPointF(square*(width+10)/2,square*(height)/2)
 
-void Background::makePath(QPointF currentPoint) { // путь строится правильно,  но перемещение сделано не правильно
-  path.push_back(currentPoint);
-  if (currentPoint != end) {
-        size_t x = currentPoint.x()/square + m/2,  // столбик
-               y = currentPoint.y()/square + m/2;     // строка
-        QPointF newPoint;
-        if (x!=m-1) { // right
-            if(map[y][x+1] == 'r' || map[y][x+1] == 'e') {
-              newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
-              if (!path.contains(newPoint))
-                 //if (newPoint != end)
-                    makePath(newPoint);
-              }
-        }
-        if(x!=0) { // left
-            if(map[y][x-1] == 'r' || map[y][x-1] == 'e') {
-              newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
-             if (!path.contains(newPoint))
-                 //if (newPoint != end)
-                    makePath(newPoint);
-            }
-        }
-        if(y!=m-1) { // down
-            if(map[y+1][x] == 'r' || map[y+1][x] == 'e') {
-              newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
-              if (!path.contains(newPoint))
-                // if (newPoint != end)
-                   makePath(newPoint);
-              }
-        }
-        if(y!=0) { // up
-            if(map[y-1][x] == 'r' || map[y-1][x] == 'e') {
-              newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
-              if (!path.contains(newPoint))
-                // if (newPoint != end)
-                    makePath(newPoint);
-              }
-        }
-    }
+
 }
 
 
-
-void Background::addUnit() {
-
-  Unit *unit = new Unit(this, start);
-  this->scene->addItem(unit);
-  units.push_back(unit);
+bool Background::waveCompleted() {
+  if (numberOfUnitsToSpawn == 0)
+    return true;
+  else
+    return false;
 }
+
+
+//void Background::makePath(QPointF currentPoint) { // путь строится правильно,  но перемещение сделано не правильно
+//  path.push_back(currentPoint);
+//  if (currentPoint != end) {
+//        size_t x = currentPoint.x()/square + m/2,  // столбик
+//               y = currentPoint.y()/square + m/2;     // строка
+//        QPointF newPoint;
+//        if (x!=m-1) { // right
+//            if(map[y][x+1] == 'r' || map[y][x+1] == 'e') {
+//              newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
+//              if (!path.contains(newPoint))
+//                 //if (newPoint != end)
+//                    makePath(newPoint);
+//              }
+//        }
+//        if(x!=0) { // left
+//            if(map[y][x-1] == 'r' || map[y][x-1] == 'e') {
+//              newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
+//             if (!path.contains(newPoint))
+//                 //if (newPoint != end)
+//                    makePath(newPoint);
+//            }
+//        }
+//        if(y!=m-1) { // down
+//            if(map[y+1][x] == 'r' || map[y+1][x] == 'e') {
+//              newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
+//              if (!path.contains(newPoint))
+//                // if (newPoint != end)
+//                   makePath(newPoint);
+//              }
+//        }
+//        if(y!=0) { // up
+//            if(map[y-1][x] == 'r' || map[y-1][x] == 'e') {
+//              newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
+//              if (!path.contains(newPoint))
+//                // if (newPoint != end)
+//                    makePath(newPoint);
+//              }
+//        }
+//    }
+//}
+
+
+
 
 //Unit* Background::getUnit(int x, int y) {
 

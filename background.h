@@ -5,54 +5,58 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+
+#include <QGraphicsSceneMouseEvent>
+#include <QMouseEvent>
+
 #include <vector>
 #include <queue>
+
+
 #include "units.h"
+#include "tile.h"
+
 const qreal square = 100; // размер одного квадрата
-                      // 100x100 pixels
-const int WALL   = -1;
-const int BLANK  = -2;
-const int W      =  8;         // ширина рабочего поля
-const int H      =  8;         // высота рабочего поля
-class Background : public QObject
+                     // 100x100 pixels
+
+class Background : public QGraphicsScene
 {
   Q_OBJECT
 public:
      Background();
     ~Background();
 
-    QGraphicsScene* getScene() {
-      return scene;
-    }
-
-    void fillMap(size_t _n, size_t _m, std::vector<std::vector<char> > p);
+    void fillMap(size_t _height, size_t _width, std::vector<std::vector<char> > p);
     void createMap();
     void setGameOptions(size_t _number);
-    void makePath(QPointF currentPoint);
-    void makeChanges();
+
+    void addInterface();
+
+    void addTile(QPointF pos1, QPointF pos2, QBrush brush, QPen pen);
+    void addUnit();
 
     void makeWavePath();
     bool waveCompleted();
-    void addUnit();
 
     QGraphicsItem* getItem(size_t x, size_t y);
-   // Unit* getUnit(int x, int y);
 
-    std::vector<std::vector<char> > map;
+    bool selectingMode = false;
 
-    size_t n;      // число строк
-    size_t m ;     // число столбиков
-  //  qreal square; // размер одного квадрата
-    QPointF start, end;
-    std::vector<Unit*> units;
-    QVector<QPointF> path;
+    //void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
 public slots:
   void gameTimerSlot();
   void spawnUnit();
 private:
-    size_t numberOfUnits;
-    QGraphicsScene *scene;
+    std::vector<std::vector<char> > map;
+    size_t height;      // число строк
+    size_t width;     // число столбиков
+    QPointF start, end;
+    QVector<QPointF> path;
 
+    size_t numberOfUnitsToSpawn;
+    std::vector<Unit*> units;
 };
 
 

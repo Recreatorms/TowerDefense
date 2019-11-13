@@ -16,7 +16,7 @@ Unit::~Unit(){
 
 QRectF Unit::boundingRect() const
 {
-    return QRectF(-25,-40,50,20000);
+    return QRectF(-25,-40,50,8000);
 }
 
 void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -29,29 +29,7 @@ void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(widget)
 }
 
-
-
-
-
-
 void Unit::moveTo(QPointF point) {
-
-////   границы
-////    if (this->x() - 10 < -250) {
-////          this->setX(-240);
-////     }
-////    if (this->x() + 10 > 250) {
-////          this->setX(240);
-////     }
-////    if (this->y() - 10 < -250) {
-////          this->setY(-240);
-////     }
-////    if (this->y() + 10 > 250) {
-////          this->setY(240);
-////     }
-
-
-  // путь строится правильно,  но перемещение сделано не правильно
     if (x() < point.x() && y() == point.y()) //right
         setPos(mapToScene(1,0));
     else if (x() > point.x() && y() == point.y()) //left
@@ -64,19 +42,3 @@ void Unit::moveTo(QPointF point) {
         currentPos++;
     }
 }
-
-//void Unit::completePath(std::vector<QPointF> path) {
-////  for (int i = 0; i < path.size(); i++) {
-////    while (pos() != path[i]) {
-////          moveTo(path[i]);
-////    }
-////  }
-//}
-
-//void Unit::setPosition(const QPointF &pos, Background *back){
-//  back->map[x()][y()] = 0;
-//  this->setPos(pos);
-//  back->map[pos.x()][pos.y()] = 1;
-//}
-
-

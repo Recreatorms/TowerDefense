@@ -17,16 +17,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     background.cpp \
-    interface.cpp \
     main.cpp \
     mainwindow.cpp \
+    tile.cpp \
     towers.cpp \
     units.cpp
 
 HEADERS += \
     background.h \
-    interface.h \
     mainwindow.h \
+    tile.h \
     towers.h \
     units.h
 

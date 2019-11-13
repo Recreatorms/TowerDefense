@@ -8,7 +8,6 @@
 #include "background.h"
 #include "towers.h"
 #include "units.h"
-#include "interface.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
