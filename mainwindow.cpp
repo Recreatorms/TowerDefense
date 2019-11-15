@@ -1,17 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <vector>
-
+#include <QPalette>
+#include <QPixmap>
 #include <QMouseEvent>
 #include <QDrag>
 #include <QMimeData>
 #include <QPainter>
-
-
+#include <QDir>
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
@@ -22,13 +21,13 @@ MainWindow::MainWindow(QWidget *parent)
   background = new Background();
   ui->graphicsView->setScene(background);
   ui->graphicsView->setRenderHint(QPainter::Antialiasing);
-  ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//  ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-  size_t height = 10, width = 8;
+  size_t width = 8;
   std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
   {
-        {'b', 'b', 'b', 'b', 'b', 'r', 'b', 'b'},
+        {'b', 'b', 'b', 'b', 'b', 's', 'b', 'b'},
         {'s', 'r', 'b', 'r', 'r', 'r', 'b', 'b'},
         {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
         {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
@@ -36,14 +35,20 @@ MainWindow::MainWindow(QWidget *parent)
         {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
         {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
         {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 'r'},
+        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 's'},
         {'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'},
 
   };
-  size_t numberOfUnitsToSpawn = 10;
-//  // теперь можно заполнить двумерный массив (вектор векторов)
-  background->fillMap(height, width, p);
+  QVector<QVector<size_t> > numberOfUnitsToSpawn =
+  {
+       {10, 5, 1},
+       {5, 3, 1},
+       {7}
+  };
+  // теперь можно заполнить двумерный массив (вектор векторов)
+  background->fillMap(width, p);
   background->createMap(); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
+
   background->setGameOptions(numberOfUnitsToSpawn);
   background->addInterface();
   background->makeWavePath();

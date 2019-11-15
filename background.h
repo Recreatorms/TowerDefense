@@ -5,7 +5,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
-
+#include <QTimer>
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
 
@@ -27,21 +27,22 @@ public:
      Background();
     ~Background();
 
-    void fillMap(size_t _height, size_t _width, std::vector<std::vector<char> > p);
+    void fillMap(size_t _width, std::vector<std::vector<char> > p);
     void createMap();
-    void setGameOptions(size_t _number);
+    void setGameOptions(QVector<QVector<size_t> > _number);
 
     void addInterface();
 
-    void addTile(QPointF pos1, QPointF pos2, QBrush brush, QPen pen);
-    void addUnit();
-    void addTower(QPointF pos1, QPointF pos2, QBrush brush, QPen pen, int radius);
+    void addTile(QPointF pos1, QPointF pos2, QChar type);
+    void addUnit(QPointF _start, int startPos);
+    void addTower(QPointF pos1, QPointF pos2, QChar type, int radius);
 
     void makeWavePath();
     bool waveCompleted();
 
     QGraphicsItem* getItem(size_t x, size_t y);
-
+    int currentWave = 0;
+    int wave = 0;
     bool selectingMode = false;
 
     //void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
@@ -54,11 +55,11 @@ private:
     std::vector<std::vector<char> > map;
     size_t height;      // число строк
     size_t width;     // число столбиков
-    QPointF start, end;
-    QVector<QPointF> path;
-
-    size_t numberOfUnitsToSpawn;
-    std::vector<Unit*> units;
+    QPointF end;
+    QVector<QPointF> start;
+    QVector<QVector<QPointF> > path;
+    QVector<QVector<size_t> > numberOfUnitsToSpawn;
+    QVector<Unit*>  units;
 };
 
 

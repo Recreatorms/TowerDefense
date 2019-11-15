@@ -1,10 +1,10 @@
 #include "units.h"
 
 
-Unit::Unit(QObject *parent, QPointF _start) :
+Unit::Unit(QObject *parent, QPointF _start, int _startPos) :
   QObject(parent)
 {
-
+    startPos = _startPos;
     setPos(_start);
     currentPos = 0;
     angle = 0;

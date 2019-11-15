@@ -12,25 +12,25 @@ class Tower : public QObject, public QGraphicsItem
 {
       Q_OBJECT
 public:
-    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QBrush _brush, QPen _pen, int radius);
+    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar type, int radius);
     ~Tower();
 
 
-//    void attack();
-//    void showRadius();
-//    void buyTower();
-//    void sellTower();
+    void attack();
+    void showRadius();
+    void buyTower();
+    void sellTower();
 
 
-//    int damage;
-//    int attackSpeed;
-//    int attackRadius;
+    int damage;
+    int attackSpeed;
+    int attackRadius;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
 private:
-    QBrush brush;
-    QPen pen;
+    QChar type;
+    QPixmap *spriteImage;
     QPointF pos1, pos2;
     int radius;
 };
