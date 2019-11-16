@@ -1,50 +1,31 @@
-#include "background.h"
+#include "gamescene.h"
 
-Background::Background() : QGraphicsScene() {
-//  QBrush *ibrush = new QBrush;
-//  ibrush->setTextureImage(QImage(":/images/Sprite_FX_Grass_0001"));
-//  scene->drawBackground(ibrush);
+GameScene::GameScene() :
+  QGraphicsScene()
+{
 
 }
 
-Background::~Background() {
+GameScene::~GameScene() {
 }
 
-void Background::fillMap(size_t _width, std::vector<std::vector<char> > p) {
+void GameScene::fillMap(size_t _width, std::vector<std::vector<char> > p) {
     map = std::move(p);
     height = map.size();
     width =  _width;
 }
 
-void Background::createMap() {
+void GameScene::createMap() {
   this->setSceneRect(QRectF(QPointF(-square,-square),QPointF(square,square)));
   for (size_t i = 0; i < height; i++) // потом поменять на int
     for (size_t j = 0; j < width; j++) {
         QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
-//        QColor color;
-//        QPen pen;
-//        QBrush brush;
-//        if (map[i][j] == 'b') {
-//          color = Qt::green;
-//          pen = Qt::SolidLine;
-//        }
-//        if (map[i][j] == 'r') {
-//          color = Qt::yellow;
-//          pen = Qt::NoPen;
-//        }
-//        if (map[i][j] == 'e' || map[i][j] == 's') {
-//          color = Qt::gray;
-//          pen = Qt::NoPen;
-//        }
-//        brush = QBrush(color, Qt::DiagCrossPattern);
-       // QBrush brush(color, Qt::DiagCrossPattern);
-//        this->addRect(QRectF(pos1,pos2), pen, brush);
         this->addTile(pos1, pos2, map[i][j]);
     }
  // Background Texture
   QString path;
- // path = ("../TowerDefense/images/Preview.jpg");
+  path = ("../TowerDefense/images/Preview.png");
   QPixmap bg(path);
   bg = bg.scaled(QGraphicsScene::height(), QGraphicsScene::height(), Qt::KeepAspectRatioByExpanding,Qt::FastTransformation);
   QPalette palette;
@@ -54,7 +35,7 @@ void Background::createMap() {
 
 }
 
-void Background::setGameOptions(QVector<QVector<size_t> > _number) {
+void GameScene::setGameOptions(QVector<QVector<size_t> > _number) {
   for (size_t i = 0; i < height; i++)
     for (size_t j = 0; j < width; j++) {
       if (map[i][j] == 's') {
@@ -70,12 +51,34 @@ void Background::setGameOptions(QVector<QVector<size_t> > _number) {
 }
 
 
-void Background::addInterface() {
-    this->addRect(QRectF(QPointF(square*(width+1)/2,-square*(height)/2),QPointF(square*(width+10)/2,square*(height)/2)), QPen(Qt::black), Qt::NoBrush);
+void GameScene::addInterface() {
+    // List of Towers
+    for (int i = 0; i < 4; i++) {
+        QPointF pos1(square*(width+1)/2, -square*(height)/2+i*square),
+                pos2(square*(width+10)/2,-square*(height)/2+(i+1)*square);
+        QChar type = 't';
+        Interface *interface = new Interface(this, pos1, pos2, type);
+        this->addItem(interface);
+        interfaces.push_back(interface);
+    }
+    // Upgrade Menu
+    QPointF pos1(square*(width+1)/2, -square*(height)/2+4*square),
+            pos2(square*(width+10)/2,-square*(height)/2+6*square);
+    QChar type = 'u';
+    Interface *interface = new Interface(this, pos1, pos2, type);
+    this->addItem(interface);
+    interfaces.push_back(interface);
+    // Info Menu
+    pos1 = QPointF(square*(width+1)/2, -square*(height)/2+6*square);
+    pos2 = QPointF(square*(width+10)/2,square*(height)/2);
+    type = 'i';
+    interface = new Interface(this, pos1, pos2, type);
+    this->addItem(interface);
+    interfaces.push_back(interface);
 
 }
 
-QGraphicsItem* Background::getItem(size_t x, size_t y) { // Зачем мне нужен этот метод??????????
+QGraphicsItem* GameScene::getItem(size_t x, size_t y) { // Зачем мне нужен этот метод??????????
   QPointF pos1(-square/2*width + x*square, -square/2*height +y*square);
   for (qreal i = 0; i < square*height; i+=square) // потом поменять на int
     for (qreal j = 0; j < square*width; j +=square) {
@@ -92,25 +95,29 @@ QGraphicsItem* Background::getItem(size_t x, size_t y) { // Зачем мне н
 
 
 
-void Background::addTile(QPointF pos1, QPointF pos2, QChar type) {
+void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
   Tile *tile = new Tile(this, pos1, pos2, type);
+
   this->addItem(tile);
 }
 
-void Background::addUnit(QPointF _start, int startPos) {
-  Unit *unit = new Unit(this, _start, startPos);
+void GameScene::addUnit(QPointF _start, int _startPos) {
+  Unit *unit = new Unit(this, _start, _startPos);
+  qreal speed = 1;
+  unit->setOptions(1/speed,2,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
 
 }
 
-void Background::addTower(QPointF pos1, QPointF pos2, QChar type, int radius) {
+void GameScene::addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius) {
   type = 'd';
   Tower *tower = new Tower(this, pos1, pos2, type, radius);
   this->addItem(tower);
+
 }
 
-void Background::makeWavePath() {
+void GameScene::makeWavePath() {
     const int WALL   = -1;
     const int BLANK  = -2;
     for (int current = 0; current < start.size(); current++) {
@@ -179,7 +186,8 @@ void Background::makeWavePath() {
     }
 }
 
-void Background::spawnUnit() {
+void GameScene::spawnUnit() {
+  if (playerHP != 0) {
     if (currentWave < numberOfUnitsToSpawn[wave].size() && numberOfUnitsToSpawn[wave][currentWave] != 0) {
          this->addUnit(path[wave][0], wave);
          numberOfUnitsToSpawn[wave][currentWave]--;
@@ -192,9 +200,11 @@ void Background::spawnUnit() {
              }
          }
     }
+    }
 }
 
-void Background::gameTimerSlot() {
+void GameScene::gameTimerSlot() {
+    if (playerHP != 0) {
     for(int k = 0; k < start.size(); k++) {
         for (int i = 0; i < units.size(); i++) {
             if(units[i]->startPos == k) {
@@ -204,30 +214,44 @@ void Background::gameTimerSlot() {
                     units[i]->moveTo(path[k][units[i]->currentPos]);
 
 
-                if(units[i]->pos() == end) {
+                if(units[i]->pos() == end || units[i]->hp == 0) {
+                    if (units[i]->pos() == end)
+                      playerHP -= units[i]->attackBaseValue;
+                    int index = i;
                     units[i]->~Unit();
+                    if (index == units.size()-1)
+                      units.pop_back();
+                    else {
                     if (units.size() > 1) {
-                        for (int j = 0; j < units.size()-1; j++)
+                        for (int j = index; j < units.size()-1; j++)
                             units[j] = units[j+1];
                         units[units.size()-2] = units[units.size()-1];
                         units.pop_back();
                     } else
                         units.pop_back();
-
+                    }
                 }
             }
         }
     }
+      } else {
+        this->addText("ggwp",QFont("Comic Sans MS", 40,-1,false));
+        return;
+      }
 }
 
 
-void Background::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
-{
+void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+  if(playerHP != 0) { // Если игрок ещё не проиграл
     // Выбрать башню для постройки
-    if (mouseEvent->scenePos().x() >= square*(width+1)/2 && mouseEvent->scenePos().x() <= square*(width+10)/2 &&
-        mouseEvent->scenePos().y() >= -square*height/2 && mouseEvent->scenePos().y() <= square*height/2) {
-        selectingMode = true;
-    }
+    for (int i = 0; i < interfaces.size(); i++)
+      if (interfaces[i]->selectingMode) {
+         selectingMode = true;
+         break;
+      }
+      else
+         selectingMode = false;
+
     // Выбрать определенный тайл
     if (selectingMode)
     for (int i = 0; i < height; i++)
@@ -238,15 +262,16 @@ void Background::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
                                 QChar type = 'd';
-                                addTower(pos1,pos2, type, square);
-                                selectingMode = false;
+                                addTower(pos1,pos2, type, 1);
+                                for (int k = 0; k < interfaces.size(); k++)
+                                  interfaces[k]->selectingMode = false;
                                 break;
                         }
                     }
+  }
 }
 
-
-bool Background::waveCompleted() {
+bool GameScene::waveCompleted() {
 //  if (numberOfUnitsToSpawn == 0)
 //    return true;
 //  else

@@ -16,17 +16,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    background.cpp \
+    bullet.cpp \
+    gamescene.cpp \
     interface.cpp \
     main.cpp \
     mainwindow.cpp \
+    tile.cpp \
     towers.cpp \
     units.cpp
 
 HEADERS += \
-    background.h \
+    bullet.h \
+    gamescene.h \
     interface.h \
     mainwindow.h \
+    tile.h \
     towers.h \
     units.h \
     view.h

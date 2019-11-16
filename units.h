@@ -11,23 +11,23 @@
 
 class Unit : public QObject, public QGraphicsItem
 {
- Q_OBJECT
+   Q_OBJECT
 public:
     explicit Unit(QObject *parent, QPointF _start, int _startPos);
     ~Unit();
- //   void setPosition(const QPointF &pos, Background *back);
+    void setOptions(qreal _speed, int _hp, int _attackBaseValue);
     void moveTo(QPointF point);
- //   void completePath(std::vector<QPointF> path);
-    int currentPos;
     int startPos;
+    int currentPos;
+    int hp;
+    int attackBaseValue;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 private:
     QGraphicsItem *item;
-    int hp;
-    qreal angle;
-    QLabel *label;
+
+    qreal speed;
 };
 
 #endif // UNITS_H

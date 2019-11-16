@@ -4,9 +4,8 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QTimer>
-
-#include "background.h"
-
+#include <QMouseEvent>
+#include "gamescene.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,14 +17,12 @@ class MainWindow : public QMainWindow
 
 public:
   MainWindow(QWidget *parent = nullptr);
-  ~MainWindow() override;
-
+  ~MainWindow();
 public slots:
 private:
   Ui::MainWindow * ui;
   QTimer         * timer;
   QTimer         * spawnTimer;
-  Background     * background;
- // Background *background;
+  GameScene      * gameScene;
 };
 #endif // MAINWINDOW_H

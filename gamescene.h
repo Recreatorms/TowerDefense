@@ -12,20 +12,20 @@
 #include <vector>
 #include <queue>
 
-
+#include "bullet.h"
 #include "units.h"
 #include "tile.h"
 #include "towers.h"
-
+#include "interface.h"
 const qreal square = 100; // размер одного квадрата
                      // 100x100 pixels
 
-class Background : public QGraphicsScene
+class GameScene : public QGraphicsScene
 {
   Q_OBJECT
 public:
-     Background();
-    ~Background();
+     GameScene();
+    ~GameScene();
 
     void fillMap(size_t _width, std::vector<std::vector<char> > p);
     void createMap();
@@ -35,7 +35,7 @@ public:
 
     void addTile(QPointF pos1, QPointF pos2, QChar type);
     void addUnit(QPointF _start, int startPos);
-    void addTower(QPointF pos1, QPointF pos2, QChar type, int radius);
+    void addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius);
 
     void makeWavePath();
     bool waveCompleted();
@@ -55,11 +55,17 @@ private:
     std::vector<std::vector<char> > map;
     size_t height;      // число строк
     size_t width;     // число столбиков
-    QPointF end;
     QVector<QPointF> start;
+    QPointF end;
+
     QVector<QVector<QPointF> > path;
+
     QVector<QVector<size_t> > numberOfUnitsToSpawn;
     QVector<Unit*>  units;
+    QVector<Tower*> towers;
+
+    int playerHP = 3;
+    QVector<Interface*> interfaces;
 };
 
 

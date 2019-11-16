@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
   this->resize(1920,1080);
 // this->setFixedSize(1920,1080);
-  background = new Background();
-  ui->graphicsView->setScene(background);
+  gameScene = new GameScene();
+  ui->graphicsView->setScene(gameScene);
   ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 //  ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 //  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -46,17 +46,18 @@ MainWindow::MainWindow(QWidget *parent)
        {7}
   };
   // теперь можно заполнить двумерный массив (вектор векторов)
-  background->fillMap(width, p);
-  background->createMap(); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
+  gameScene->fillMap(width, p);
+  gameScene->createMap(); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
+  gameScene->addInterface();
 
-  background->setGameOptions(numberOfUnitsToSpawn);
-  background->addInterface();
-  background->makeWavePath();
+  gameScene->setGameOptions(numberOfUnitsToSpawn);
+  gameScene->makeWavePath();
+
   timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
   spawnTimer = new QTimer();
-  connect(spawnTimer, &QTimer::timeout, background, &Background::spawnUnit);
-  connect(timer, &QTimer::timeout, background, &Background::gameTimerSlot);
-  timer->start(1000/160); // это важно
+  connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
+  connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
+  timer->start(1000/120); // это важно
   spawnTimer->start(500);
 
 
@@ -66,6 +67,7 @@ MainWindow::~MainWindow()
 {
   delete ui;
 }
+
 
 
 
