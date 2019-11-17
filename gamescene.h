@@ -38,9 +38,8 @@ public:
     void addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius);
 
     void makeWavePath();
-    bool waveCompleted();
 
-    QGraphicsItem* getItem(size_t x, size_t y);
+    QGraphicsItem* getItem(size_t x, size_t y); // зачем?
     int currentWave = 0;
     int wave = 0;
     bool selectingMode = false;
@@ -64,7 +63,7 @@ private:
     QVector<Unit*>  units;
     QVector<Tower*> towers;
 
-    int playerHP = 3;
+    int playerHP = 20;
     QVector<Interface*> interfaces;
 };
 

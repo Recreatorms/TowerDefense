@@ -104,7 +104,7 @@ void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
 void GameScene::addUnit(QPointF _start, int _startPos) {
   Unit *unit = new Unit(this, _start, _startPos);
   qreal speed = 1;
-  unit->setOptions(1/speed,2,1); // speed/hp/attackPower
+  unit->setOptions(1/speed,5,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
 
@@ -117,74 +117,6 @@ void GameScene::addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius) {
 
 }
 
-void GameScene::makeWavePath() {
-    const int WALL   = -1;
-    const int BLANK  = -2;
-    for (int current = 0; current < start.size(); current++) {
-    std::vector<std::vector<int> > labyrinth (height, std::vector<int> (width));
-    for(size_t i = 0; i < height; i++)
-        for (size_t j = 0; j < width; j++)
-          if (map[i][j] == 'b')
-              labyrinth[i][j] = WALL;
-            else if (map[i][j] == 'r' || map[i][j] == 'e' || map[i][j] == 's')
-              labyrinth[i][j] = BLANK;
-  ///////
-      QVector<QPointF> currentPath;
-      int ay = start[current].y()/square + height/2,
-          ax = start[current].x()/square + width/2,
-          by = end.y()/square + height/2,
-          bx = end.x()/square + width/2;
-      int dx[4] = {1, 0, -1, 0};   // смещения, соответствующие соседям ячейки
-      int dy[4] = {0, 1, 0, -1};   // справа, снизу, слева и сверху
-      int d, x, y, k;
-      bool stop;
-
-
-      // распространение волны
-      d = 0;
-      labyrinth[ay][ax] = 0;            // стартовая ячейка помечена 0
-      do {
-        stop = true;               // предполагаем, что все свободные клетки уже помечены
-        for (y = 0; y < height; ++y)
-          for (x = 0; x < width; ++x)
-            if (labyrinth[y][x] == d)                         // ячейка (x, y) помечена числом d
-            {
-              for ( k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
-              {
-                 int iy = y + dy[k],
-                     ix = x + dx[k];
-                 if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == BLANK)
-                 {
-                    stop = false;              // найдены непомеченные клетки
-                    labyrinth[iy][ix] = d + 1;      // распространяем волну
-                 }
-              }
-            }
-        d++;
-      } while ( !stop && labyrinth[by][bx] == BLANK );
-
-
-      // восстановление пути
-      d = labyrinth[by][bx];            // длина кратчайшего пути из (ax, ay) в (bx, by)
-      x = bx;
-      y = by;
-      while ( d > 0 ) {
-        currentPath.push_front(QPointF(x*square - square*(width-1)/2, y*square - (height-1) * square/2));                   // записываем ячейку (x, y) в путь
-        d--;
-        for (k = 0; k < 4; ++k) {
-           int iy = y + dy[k],
-               ix = x + dx[k];
-           if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == d) {
-              x = x + dx[k];
-              y = y + dy[k];           // переходим в ячейку, которая на 1 ближе к старту
-              break;
-          }
-        }
-      }
-      currentPath.push_front(QPointF(ax*square - square*(width-1)/2, ay*square - (height-1) * square/2));        // теперь px[0..len] и py[0..len] - координаты ячеек пути
-      path.push_back(currentPath);
-    }
-}
 
 void GameScene::spawnUnit() {
   if (playerHP != 0) {
@@ -262,7 +194,7 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
                                 QChar type = 'd';
-                                addTower(pos1,pos2, type, 1);
+                                addTower(pos1,pos2, type, 2.5);
                                 for (int k = 0; k < interfaces.size(); k++)
                                   interfaces[k]->selectingMode = false;
                                 break;
@@ -271,11 +203,73 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   }
 }
 
-bool GameScene::waveCompleted() {
-//  if (numberOfUnitsToSpawn == 0)
-//    return true;
-//  else
-//    return false;
+void GameScene::makeWavePath() {
+    const int WALL   = -1;
+    const int BLANK  = -2;
+    for (int current = 0; current < start.size(); current++) {
+    std::vector<std::vector<int> > labyrinth (height, std::vector<int> (width));
+    for(size_t i = 0; i < height; i++)
+        for (size_t j = 0; j < width; j++)
+          if (map[i][j] == 'b')
+              labyrinth[i][j] = WALL;
+            else if (map[i][j] == 'r' || map[i][j] == 'e' || map[i][j] == 's')
+              labyrinth[i][j] = BLANK;
+  ///////
+      QVector<QPointF> currentPath;
+      int ay = start[current].y()/square + height/2,
+          ax = start[current].x()/square + width/2,
+          by = end.y()/square + height/2,
+          bx = end.x()/square + width/2;
+      int dx[4] = {1, 0, -1, 0};   // смещения, соответствующие соседям ячейки
+      int dy[4] = {0, 1, 0, -1};   // справа, снизу, слева и сверху
+      int d, x, y, k;
+      bool stop;
+
+
+      // распространение волны
+      d = 0;
+      labyrinth[ay][ax] = 0;            // стартовая ячейка помечена 0
+      do {
+        stop = true;               // предполагаем, что все свободные клетки уже помечены
+        for (y = 0; y < height; ++y)
+          for (x = 0; x < width; ++x)
+            if (labyrinth[y][x] == d)                         // ячейка (x, y) помечена числом d
+            {
+              for ( k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
+              {
+                 int iy = y + dy[k],
+                     ix = x + dx[k];
+                 if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == BLANK)
+                 {
+                    stop = false;              // найдены непомеченные клетки
+                    labyrinth[iy][ix] = d + 1;      // распространяем волну
+                 }
+              }
+            }
+        d++;
+      } while ( !stop && labyrinth[by][bx] == BLANK );
+
+
+      // восстановление пути
+      d = labyrinth[by][bx];            // длина кратчайшего пути из (ax, ay) в (bx, by)
+      x = bx;
+      y = by;
+      while ( d > 0 ) {
+        currentPath.push_front(QPointF(x*square - square*(width-1)/2, y*square - (height-1) * square/2));                   // записываем ячейку (x, y) в путь
+        d--;
+        for (k = 0; k < 4; ++k) {
+           int iy = y + dy[k],
+               ix = x + dx[k];
+           if (iy >= 0 && iy < height && ix >= 0 && ix < width && labyrinth[iy][ix] == d) {
+              x = x + dx[k];
+              y = y + dy[k];           // переходим в ячейку, которая на 1 ближе к старту
+              break;
+          }
+        }
+      }
+      currentPath.push_front(QPointF(ax*square - square*(width-1)/2, ay*square - (height-1) * square/2));        // теперь px[0..len] и py[0..len] - координаты ячеек пути
+      path.push_back(currentPath);
+    }
 }
 
 

@@ -28,22 +28,21 @@ public:
     int damage;
     int attackSpeed;
     qreal distanceTo(QGraphicsItem *item);
-    void attackTarget();
+    void attackTarget(QPointF destination);
 public slots:
     void acquireTarget();
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
+
 private:
     QPointF pos1, pos2;
 
     QChar type;
     qreal attackRadius;
-
     bool hasTarget;
     QPointF attackDest;
     QGraphicsEllipseItem * attackArea;
-
     QPixmap *spriteImage;
 };
 

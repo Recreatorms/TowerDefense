@@ -41,9 +41,9 @@ MainWindow::MainWindow(QWidget *parent)
   };
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {10, 5, 1},
-       {5, 3, 1},
-       {7}
+       {10},
+       {10},
+       {20}
   };
   // теперь можно заполнить двумерный массив (вектор векторов)
   gameScene->fillMap(width, p);
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
   connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
   timer->start(1000/120); // это важно
-  spawnTimer->start(500);
+  spawnTimer->start(750);
 
 
 }

@@ -21,14 +21,19 @@ void Unit::setOptions(qreal _speed, int _hp, int _attackBaseValue)
 
 QRectF Unit::boundingRect() const
 {
-    return QRectF(-25,-40,50,8000);
+    return QRectF(-10,-10,20,20); // иначе говоря хитбокс
 }
 
 void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     QPolygon polygon;
     polygon << QPoint(-10, -10) <<  QPoint(-10, 10) << QPoint(10, 10) << QPoint(10,-10);// << QPoint(0,-40);
-    painter->setBrush(Qt::red);
+    if (hp == 5)
+      painter->setBrush(Qt::green);
+    if (hp <= 4)
+      painter->setBrush(Qt::yellow);
+    if (hp <= 2)
+      painter->setBrush(Qt::red);
     painter->drawPolygon(polygon);
     Q_UNUSED(option)
     Q_UNUSED(widget)
