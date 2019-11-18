@@ -28,12 +28,14 @@ void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 {
     QPolygon polygon;
     polygon << QPoint(-10, -10) <<  QPoint(-10, 10) << QPoint(10, 10) << QPoint(10,-10);// << QPoint(0,-40);
-    if (hp == 5)
-      painter->setBrush(Qt::green);
     if (hp <= 4)
-      painter->setBrush(Qt::yellow);
+        painter->setBrush(Qt::blue);
+    if (hp <= 3)
+        painter->setBrush(Qt::green);
     if (hp <= 2)
-      painter->setBrush(Qt::red);
+        painter->setBrush(Qt::yellow);
+    if (hp == 1)
+        painter->setBrush(Qt::red);
     painter->drawPolygon(polygon);
     Q_UNUSED(option)
     Q_UNUSED(widget)

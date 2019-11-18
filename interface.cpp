@@ -38,25 +38,3 @@ void Interface::mousePressEvent(QGraphicsSceneMouseEvent *event)
     selectingMode = true;
     typeOfTower = 't';
 }
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//InfoScreen::InfoScreen(QObject *parent, QPointF _pos1, QPointF _pos2) :
-//    QObject(parent), QGraphicsItem()
-//{
-//    pos1 = QPointF(_pos1.x(),_pos1.y() + 100);
-//    pos2 = QPointF(_pos1.x(),_pos1.y() + 100);
-
-//}
-
-//QRectF InfoScreen::boundingRect() const
-//{
-//  return QRectF(pos1,pos2);
-//}
-
-//void InfoScreen::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//  painter->setBrush(QBrush(Qt::DiagCrossPattern));
-//  painter->setPen(Qt::black);
-//  painter->drawRect(QRectF(pos1,pos2));
-//  Q_UNUSED(option)
-//  Q_UNUSED(widget)
-//}

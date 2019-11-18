@@ -1,6 +1,6 @@
 #include "towers.h"
 
-Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type, qreal _radius) :
+Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type, qreal _radius, QVector<Unit*> _units) :
              QObject(parent), QGraphicsItem()
 {
     pos1 = _pos1;
@@ -8,16 +8,20 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type, qreal _
  //   setPos(_pos1-_pos2);
     attackRadius = _radius+0.5;
     type = _type;
-
+    units = _units;
     hasTarget = false;
-
+    onCooldown = false;
+    reloadSpeed = 250;
+    reloading = 200;
     QTimer *attackTimer;
     attackTimer = new QTimer();
-    attackTimer->start(150);
+    attackTimer->start(1);
     connect(attackTimer, &QTimer::timeout, this, &Tower::acquireTarget);
     attackArea = new QGraphicsEllipseItem(QRectF(pos1*attackRadius*2.1,pos2*attackRadius*2.1),this);
     attackArea->setPos(((pos1+pos2)/2)-attackArea->rect().center());
-
+}
+void Tower::updateUnits(QVector<Unit *> _units) {
+    units = _units;
 }
 
 qreal Tower::distanceTo(QGraphicsItem *item)
@@ -38,15 +42,25 @@ void Tower::attackTarget(QPointF destination) {
 }
 
 void Tower::acquireTarget() {
- // QList<QGraphicsItem *> collidingItems;
-  QList<Unit*>  collidingUnits;
-  for(int i = 0; i < attackArea->collidingItems().size(); i++){
-    Unit *unit = dynamic_cast<Unit*>(attackArea->collidingItems()[i]);
-    if (unit) {
-      collidingUnits.push_back(unit);
-      break;
+    if (reloading >= reloadSpeed)
+        onCooldown = false;
+    if (onCooldown) {
+        reloading++;
+        return;
     }
+  //QList<QGraphicsItem *> collidingItems = attackArea->collidingItems();
+  QPointF centerOfAttackArea(attackArea->pos()+attackArea->rect().center());
+  QList<Unit*>  collidingUnits;
+  for (int i = 0; i < units.size(); i++) {
+      QLineF line(units[i]->pos(),centerOfAttackArea);
+      if (line.length() < attackRadius*50*2.1 && !collidingUnits.contains(units[i]))
+          collidingUnits.push_back(units[i]);
   }
+//  for (int i = 0; i < collidingUnits.size(); i++) {
+//      QLineF line(collidingUnits[i]->pos(),centerOfAttackArea);
+//      if (line.length() > attackRadius*50*2.1 || collidingUnits[i]->hp == 0)
+//          collidingUnits.pop_front();
+//  }
   hasTarget = false;
   if (collidingUnits.size() == 0) {
     hasTarget = false;
@@ -55,7 +69,7 @@ void Tower::acquireTarget() {
   else {
   qreal closestDist = attackRadius*50*2.1;
   QPointF closestPoint(0,0);
-  for (int i = collidingUnits.size() - 1; i >= 0; i--) {
+  for (int i = 0; i < collidingUnits.size(); i++) {
       qreal thisDist = distanceTo(collidingUnits[i]);
       if (thisDist < closestDist) {
          closestDist = thisDist;
@@ -65,11 +79,13 @@ void Tower::acquireTarget() {
       }
 
   }
+
   attackDest = closestPoint;
+  }
   if (hasTarget)
      attackTarget(attackDest);
-
-  }
+     onCooldown = true;
+     reloading = 0;
 }
 
 

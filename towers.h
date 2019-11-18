@@ -12,11 +12,12 @@
 #include <QGraphicsScene>
 #include "bullet.h"
 #include "units.h"
+#include "tile.h"
 class Tower : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar type, qreal radius);
+    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar type, qreal radius, QVector<Unit*> _units);
     ~Tower() {}
 
     void shoot();
@@ -24,7 +25,7 @@ public:
     void buyTower();
     void sellTower();
 
-
+    void updateUnits(QVector<Unit*> _units);
     int damage;
     int attackSpeed;
     qreal distanceTo(QGraphicsItem *item);
@@ -37,9 +38,12 @@ protected:
 
 private:
     QPointF pos1, pos2;
-
+    QVector<Unit*> units;
     QChar type;
     qreal attackRadius;
+    bool onCooldown;
+    int reloadSpeed;
+    int reloading;
     bool hasTarget;
     QPointF attackDest;
     QGraphicsEllipseItem * attackArea;

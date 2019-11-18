@@ -4,13 +4,6 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <vector>
-#include <QPalette>
-#include <QPixmap>
-#include <QMouseEvent>
-#include <QDrag>
-#include <QMimeData>
-#include <QPainter>
-#include <QDir>
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
@@ -41,8 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
   };
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {10},
-       {10},
+       {15, 20, 5},
+       {10, 10, 10},
        {20}
   };
   // теперь можно заполнить двумерный массив (вектор векторов)
@@ -58,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
   connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
   timer->start(1000/120); // это важно
-  spawnTimer->start(750);
+  spawnTimer->start(500);
 
 
 }

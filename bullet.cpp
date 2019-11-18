@@ -11,27 +11,26 @@ Bullet::Bullet(QObject * parent, qreal _radiusOfTower, QPointF _originPos,  QPoi
     destination = _destination;
     type = _type;
     radiusOfTower = _radiusOfTower;
-    stepSize = 50 /*radiusOfTower/(3.33)/10*/;
+    stepSize = 3 /*radiusOfTower/(3.33)/10*/;
     time = 0;
     moveTimer = new QTimer();
     connect(moveTimer, &QTimer::timeout, this, &Bullet::move);
-    moveTimer->start(30);
+    moveTimer->start(1);
 }
 
 void Bullet::move()
 {
-  double theta = rotation(); // degrees
+  double theta = -QLineF(originPos, destination).angle(); // degrees
   // y = ax^2+bx+c
-  qreal dx, dy; /*dx = stepSize * qCos(qDegreesToRadians(theta)),
-        dy = stepSize * qSin(qDegreesToRadians(theta));*/
+  qreal dx, dy;
 //  theta *=-1;
 //  if (theta > 180)
 //    theta = -(45+(360-theta));
 //  else
 //    theta = -(-45+(360-theta));
+//  //time +=0.3;
   dx = stepSize * qCos(qDegreesToRadians(theta));
-  dy = stepSize * qSin(qDegreesToRadians(theta))/*+10*time*/;
-  time +=1;
+  dy = stepSize * qSin(qDegreesToRadians(theta))+10*time;
 
   setPos(x() + dx, y()+ dy);
   // Замедление стрелы
@@ -41,13 +40,14 @@ void Bullet::move()
     stepSize = stepSize * 0.1;
 
   QLineF line(pos(),destination);
-  if (line.length() < 30) { // небольшая оптимизация
+  if (line.length() < 20) { // небольшая оптимизация
       QList<QGraphicsItem*> collidingItem = collidingItems();
       for(int i = 0; i < collidingItem.size(); i++){
         Unit *unit = dynamic_cast<Unit*>(collidingItem[i]);
         if (unit && canDealDamage) {
             unit->hp -=1;
            canDealDamage = false;
+           setOpacity(0);
            break;
         }
       }

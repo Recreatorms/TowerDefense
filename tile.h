@@ -12,7 +12,7 @@ class Tile: public QObject, public QGraphicsItem
 public:
     explicit Tile(QObject *parent, QPointF pos1, QPointF pos2, QChar type);
     ~Tile();
-  QChar type;
+    QChar type;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);

@@ -97,29 +97,33 @@ QGraphicsItem* GameScene::getItem(size_t x, size_t y) { // Зачем мне н�
 
 void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
   Tile *tile = new Tile(this, pos1, pos2, type);
-
   this->addItem(tile);
 }
 
 void GameScene::addUnit(QPointF _start, int _startPos) {
   Unit *unit = new Unit(this, _start, _startPos);
   qreal speed = 1;
-  unit->setOptions(1/speed,5,1); // speed/hp/attackPower
+  unit->setOptions(1/speed,4,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
-
+  for (int i = 0; i < towers.size(); i++)
+      towers[i]->updateUnits(units);
 }
 
 void GameScene::addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius) {
   type = 'd';
-  Tower *tower = new Tower(this, pos1, pos2, type, radius);
+  Tower *tower = new Tower(this, pos1, pos2, type, radius, units);
   this->addItem(tower);
-
+  towers.push_back(tower);
 }
 
 
 void GameScene::spawnUnit() {
   if (playerHP != 0) {
+    if (numberOfUnitsToSpawn[numberOfUnitsToSpawn.size()-1][numberOfUnitsToSpawn[numberOfUnitsToSpawn.size()-1].size()-1] == 0 && units.size() == 0) {
+        this->addText("victory",QFont("Comic Sans MS", 40,-1,false));
+        return;
+    }
     if (currentWave < numberOfUnitsToSpawn[wave].size() && numberOfUnitsToSpawn[wave][currentWave] != 0) {
          this->addUnit(path[wave][0], wave);
          numberOfUnitsToSpawn[wave][currentWave]--;
@@ -132,6 +136,7 @@ void GameScene::spawnUnit() {
              }
          }
     }
+
     }
 }
 
@@ -146,7 +151,7 @@ void GameScene::gameTimerSlot() {
                     units[i]->moveTo(path[k][units[i]->currentPos]);
 
 
-                if(units[i]->pos() == end || units[i]->hp == 0) {
+                if(units[i]->pos() == end || units[i]->hp <= 0) {
                     if (units[i]->pos() == end)
                       playerHP -= units[i]->attackBaseValue;
                     int index = i;
@@ -162,6 +167,8 @@ void GameScene::gameTimerSlot() {
                     } else
                         units.pop_back();
                     }
+                    for (int i = 0; i < towers.size(); i++)
+                        towers[i]->updateUnits(units);
                 }
             }
         }
