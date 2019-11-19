@@ -18,7 +18,7 @@
 #include "towers.h"
 #include "interface.h"
 const qreal square = 100; // размер одного квадрата
-                     // 100x100 pixels
+                          // 100x100 pixels
 
 class GameScene : public QGraphicsScene
 {
@@ -44,7 +44,6 @@ public:
     int wave = 0;
     bool selectingMode = false;
 
-    //void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 public slots:
@@ -52,6 +51,7 @@ public slots:
   void spawnUnit();
 private:
     std::vector<std::vector<char> > map;
+
     size_t height;      // число строк
     size_t width;     // число столбиков
     QVector<QPointF> start;
@@ -66,11 +66,6 @@ private:
     int playerHP = 20;
     QVector<Interface*> interfaces;
 };
-
-
-
-
-
 
 
 #endif // BACKGROUND_H

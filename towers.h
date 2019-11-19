@@ -26,7 +26,7 @@ public:
     void sellTower();
 
     void updateUnits(QVector<Unit*> _units);
-    int damage;
+    qreal damage;
     int attackSpeed;
     qreal distanceTo(QGraphicsItem *item);
     void attackTarget(QPointF destination);

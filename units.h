@@ -19,7 +19,7 @@ public:
     void moveTo(QPointF point);
     int startPos;
     int currentPos;
-    int hp;
+    qreal hp;
     int attackBaseValue;
 protected:
     QRectF boundingRect() const;

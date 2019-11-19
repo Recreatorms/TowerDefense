@@ -21,7 +21,7 @@ void Unit::setOptions(qreal _speed, int _hp, int _attackBaseValue)
 
 QRectF Unit::boundingRect() const
 {
-    return QRectF(-10,-10,20,20); // иначе говоря хитбокс
+    return QRectF(-15,-15,30,30); // иначе говоря хитбокс
 }
 
 void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

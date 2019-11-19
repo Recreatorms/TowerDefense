@@ -2,7 +2,8 @@
 #include <QPixmap>
 #include <QTimer>
 #include <qmath.h>
-Bullet::Bullet(QObject * parent, qreal _radiusOfTower, QPointF _originPos,  QPointF _destination, QChar _type) :
+const qreal g = 9.8;
+Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QChar _type, qreal _radiusOfTower, qreal _damage) :
   QObject(parent)
 {
     setPixmap(QPixmap("../TowerDefense/images/bullet.png"));
@@ -11,7 +12,14 @@ Bullet::Bullet(QObject * parent, qreal _radiusOfTower, QPointF _originPos,  QPoi
     destination = _destination;
     type = _type;
     radiusOfTower = _radiusOfTower;
-    stepSize = 3 /*radiusOfTower/(3.33)/10*/;
+    damage = _damage;
+    QLineF overallDistance(originPos, destination); // degrees
+    double alpha = -overallDistance.angle();
+    Vo = 94;
+    double length = overallDistance.length();
+    alpha = -45;
+    Vx = Vo * qCos(qDegreesToRadians(alpha));
+    Vy = Vo * qSin((qDegreesToRadians(alpha)));
     time = 0;
     moveTimer = new QTimer();
     connect(moveTimer, &QTimer::timeout, this, &Bullet::move);
@@ -20,42 +28,50 @@ Bullet::Bullet(QObject * parent, qreal _radiusOfTower, QPointF _originPos,  QPoi
 
 void Bullet::move()
 {
-  double theta = -QLineF(originPos, destination).angle(); // degrees
-  // y = ax^2+bx+c
+  QLineF overallDistance(originPos, destination); // degrees
+  double alpha = -overallDistance.angle();
   qreal dx, dy;
+  if (type == '4') {
+
+    time +=0.3;
+    dx = Vx*time;
+    dy = Vy*time + g*pow(time,2)/2;
+  // y = ax^2+bx+c
 //  theta *=-1;
 //  if (theta > 180)
 //    theta = -(45+(360-theta));
 //  else
 //    theta = -(-45+(360-theta));
-//  //time +=0.3;
-  dx = stepSize * qCos(qDegreesToRadians(theta));
-  dy = stepSize * qSin(qDegreesToRadians(theta))+10*time;
 
-  setPos(x() + dx, y()+ dy);
+
+  } else {
+  dx = Vo * qCos(qDegreesToRadians(alpha));
+  dy = Vo * qSin(qDegreesToRadians(alpha));
+  }
+  setPos(originPos.x() + dx, originPos.y()+ dy);
   // Замедление стрелы
   // if (type == ....) { ...
   QLineF distance(originPos,pos());
-  if  (distance.length() > radiusOfTower)
-    stepSize = stepSize * 0.1;
+//  if  (distance.length() > radiusOfTower)
+//    stepSize = stepSize * 0.1;
 
   QLineF line(pos(),destination);
-  if (line.length() < 20) { // небольшая оптимизация
+  if (line.length() < 5) { // небольшая оптимизация
       QList<QGraphicsItem*> collidingItem = collidingItems();
       for(int i = 0; i < collidingItem.size(); i++){
         Unit *unit = dynamic_cast<Unit*>(collidingItem[i]);
         if (unit && canDealDamage) {
-            unit->hp -=1;
+            unit->hp -= damage;
            canDealDamage = false;
            setOpacity(0);
            break;
         }
       }
     }
-  if (stepSize < 0.3) {
-      setOpacity(opacity()-0.15);
-      canDealDamage = false;
-  }
+//  if (stepSize < 0.3) {
+//      setOpacity(opacity()-0.15);
+//      canDealDamage = false;
+//  }
 
   if (opacity()== 0.0)
       this->~Bullet();

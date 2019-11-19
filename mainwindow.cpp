@@ -20,15 +20,15 @@ MainWindow::MainWindow(QWidget *parent)
   size_t width = 8;
   std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
   {
-        {'b', 'b', 'b', 'b', 'b', 's', 'b', 'b'},
-        {'s', 'r', 'b', 'r', 'r', 'r', 'b', 'b'},
-        {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
+        {'b', 'b', 'b', 'b', 'b', 'r', 'b', 'b'},
+        {'b', 'r', 'r', 'r', 'r', 'r', 'b', 'b'},
         {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
         {'b', 'r', 'r', 'r', 'b', 'b', 'b', 'b'},
+        {'b', 'r', 'b', 'r', 'r', 'r', 'r', 's'},
+        {'b', 'e', 'b', 'b', 'b', 'b', 'b', 'b'},
         {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
         {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 's'},
+        {'b', 'r', 'r', 'r', 'r', 'r', 'r', 's'},
         {'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'},
 
   };

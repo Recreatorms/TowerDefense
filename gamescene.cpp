@@ -56,10 +56,11 @@ void GameScene::addInterface() {
     for (int i = 0; i < 4; i++) {
         QPointF pos1(square*(width+1)/2, -square*(height)/2+i*square),
                 pos2(square*(width+10)/2,-square*(height)/2+(i+1)*square);
-        QChar type = 't';
+        QChar type = i + 1 + '0';
         Interface *interface = new Interface(this, pos1, pos2, type);
         this->addItem(interface);
         interfaces.push_back(interface);
+        this->setFocusItem(interface);
     }
     // Upgrade Menu
     QPointF pos1(square*(width+1)/2, -square*(height)/2+4*square),
@@ -98,11 +99,12 @@ QGraphicsItem* GameScene::getItem(size_t x, size_t y) { // Зачем мне н�
 void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
   Tile *tile = new Tile(this, pos1, pos2, type);
   this->addItem(tile);
+
 }
 
 void GameScene::addUnit(QPointF _start, int _startPos) {
   Unit *unit = new Unit(this, _start, _startPos);
-  qreal speed = 1;
+  qreal speed = 2;
   unit->setOptions(1/speed,4,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
@@ -111,10 +113,20 @@ void GameScene::addUnit(QPointF _start, int _startPos) {
 }
 
 void GameScene::addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius) {
-  type = 'd';
-  Tower *tower = new Tower(this, pos1, pos2, type, radius, units);
-  this->addItem(tower);
-  towers.push_back(tower);
+  QTransform trans;
+  QList<QGraphicsItem*> items = this->items((pos1+pos2)/2);
+  Tile *tile = nullptr;
+  for (int i = 0; i < items.size(); i++)
+    tile= static_cast<Tile*>(items[i]);
+  if (!tile->hasTower) {
+    Tower *tower = new Tower(this, pos1, pos2, type, radius, units);
+    this->addItem(tower);
+    towers.push_back(tower);
+    tile->hasTower = true;
+  } else
+    this->addText("can't place same tower on same tile",QFont("Comic Sans MS", 40,-1,false));
+
+
 }
 
 
@@ -141,7 +153,7 @@ void GameScene::spawnUnit() {
 }
 
 void GameScene::gameTimerSlot() {
-    if (playerHP != 0) {
+   if (playerHP != 0) {
     for(int k = 0; k < start.size(); k++) {
         for (int i = 0; i < units.size(); i++) {
             if(units[i]->startPos == k) {
@@ -154,6 +166,7 @@ void GameScene::gameTimerSlot() {
                 if(units[i]->pos() == end || units[i]->hp <= 0) {
                     if (units[i]->pos() == end)
                       playerHP -= units[i]->attackBaseValue;
+
                     int index = i;
                     units[i]->~Unit();
                     if (index == units.size()-1)
@@ -183,9 +196,11 @@ void GameScene::gameTimerSlot() {
 void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if(playerHP != 0) { // Если игрок ещё не проиграл
     // Выбрать башню для постройки
-    for (int i = 0; i < interfaces.size(); i++)
+   QChar type;
+   for (int i = 0; i < interfaces.size(); i++)
       if (interfaces[i]->selectingMode) {
          selectingMode = true;
+         type = interfaces[i]->typeOfTower;
          break;
       }
       else
@@ -200,8 +215,8 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
                                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
-                                QChar type = 'd';
-                                addTower(pos1,pos2, type, 2.5);
+
+                                addTower(pos1,pos2, type, 3);
                                 for (int k = 0; k < interfaces.size(); k++)
                                   interfaces[k]->selectingMode = false;
                                 break;

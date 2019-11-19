@@ -11,19 +11,22 @@ class Bullet : public QObject, public QGraphicsPixmapItem
 {
   Q_OBJECT
 public:
-  Bullet(QObject * parent, qreal _radiusOfTower, QPointF _originPos, QPointF _destination, QChar _type);
+  Bullet(QObject * parent, QPointF _originPos, QPointF _destination, QChar _type, qreal _radiusOfTower, qreal _damage);
   ~Bullet() override {
     moveTimer->~QTimer();}
 public slots:
   void move();
 private:
   bool canDealDamage = true;
-  qreal stepSize;
+  qreal Vo;
   QTimer *moveTimer;
   QPointF originPos;
   QPointF destination;
-  qreal radiusOfTower;
+
   QChar type;
+  qreal radiusOfTower;
+  qreal damage;
+  qreal Vx, Vy;
   double time = 0;
 };
 
