@@ -27,7 +27,9 @@ private:
   qreal radiusOfTower;
   qreal damage;
   qreal Vx, Vy;
-  double time = 0;
+  double flightTime = 0;
+  double launchTime;
+  double time;
 };
 
 #endif // BULLET_H

@@ -13,14 +13,21 @@ Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QCha
     type = _type;
     radiusOfTower = _radiusOfTower;
     damage = _damage;
-    QLineF overallDistance(originPos, destination); // degrees
-    double alpha = -overallDistance.angle();
-    Vo = 94;
-    double length = overallDistance.length();
-    alpha = -45;
-    Vx = Vo * qCos(qDegreesToRadians(alpha));
-    Vy = Vo * qSin((qDegreesToRadians(alpha)));
-    time = 0;
+    if (type == '4') {
+      Vo = 10;
+      QLineF overallDistance(originPos, destination); // degrees
+      double alpha = -overallDistance.angle();
+      double length = overallDistance.length();
+      Vo = radiusOfTower * length;
+      flightTime = length;
+      alpha = -90;
+      Vx = Vo;
+      Vy = g*flightTime;
+          //Vo * qSin((qDegreesToRadians(alpha)));
+      time = 0;
+      launchTime = time;
+    }
+    else Vo = 1;
     moveTimer = new QTimer();
     connect(moveTimer, &QTimer::timeout, this, &Bullet::move);
     moveTimer->start(1);
@@ -32,10 +39,11 @@ void Bullet::move()
   double alpha = -overallDistance.angle();
   qreal dx, dy;
   if (type == '4') {
-
-    time +=0.3;
-    dx = Vx*time;
-    dy = Vy*time + g*pow(time,2)/2;
+    time++;
+    flightTime = launchTime + time;
+    dx = Vx;
+    dy = Vy*flightTime - g*pow(flightTime,2)*0.5;
+    QPointF newPos(dx,dy);
   // y = ax^2+bx+c
 //  theta *=-1;
 //  if (theta > 180)
@@ -43,18 +51,22 @@ void Bullet::move()
 //  else
 //    theta = -(-45+(360-theta));
 
-
+  setPos(x()+dx,y() +dy);
   } else {
   dx = Vo * qCos(qDegreesToRadians(alpha));
   dy = Vo * qSin(qDegreesToRadians(alpha));
+  setPos(x() + dx, y()+ dy);
   }
-  setPos(originPos.x() + dx, originPos.y()+ dy);
   // Замедление стрелы
   // if (type == ....) { ...
   QLineF distance(originPos,pos());
 //  if  (distance.length() > radiusOfTower)
-//    stepSize = stepSize * 0.1;
+//    Vo = Vo * 0.1;
 
+//  if (Vo < 0.3) {
+//      setOpacity(opacity()-0.15);
+//      canDealDamage = false;
+//  }
   QLineF line(pos(),destination);
   if (line.length() < 5) { // небольшая оптимизация
       QList<QGraphicsItem*> collidingItem = collidingItems();
@@ -68,10 +80,6 @@ void Bullet::move()
         }
       }
     }
-//  if (stepSize < 0.3) {
-//      setOpacity(opacity()-0.15);
-//      canDealDamage = false;
-//  }
 
   if (opacity()== 0.0)
       this->~Bullet();
