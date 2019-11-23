@@ -13,6 +13,7 @@
 #include "bullet.h"
 #include "units.h"
 #include "tile.h"
+#include "friendlynpc.h"
 class Tower : public QObject, public QGraphicsItem
 {
    Q_OBJECT

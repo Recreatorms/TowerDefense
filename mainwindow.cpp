@@ -20,21 +20,21 @@ MainWindow::MainWindow(QWidget *parent)
   size_t width = 8;
   std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
   {
-        {'b', 'b', 'b', 'b', 'b', 'r', 'b', 'b'},
-        {'b', 'r', 'r', 'r', 'r', 'r', 'b', 'b'},
+        {'b', 'b', 'b', 'b', 'b', 's', 'b', 'b'},
+        {'s', 'r', 'b', 'r', 'r', 'r', 'b', 'b'},
         {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'r', 'r', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'r', 'b', 'r', 'r', 'r', 'r', 's'},
-        {'b', 'e', 'b', 'b', 'b', 'b', 'b', 'b'},
-        {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'b', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'r', 'r', 'r', 'r', 'r', 'r', 's'},
+        {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
+        {'b', 'r', 'b', 'r', 'b', 'b', 'r', 's'},
+        {'b', 'r', 'r', 'r', 'b', 'b', 'r', 'b'},
+        {'b', 'b', 'b', 'r', 'b', 'b', 'r', 'b'},
+        {'b', 'b', 'b', 'r', 'b', 'b', 'r', 'b'},
+        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 'b'},
         {'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'},
 
   };
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {15, 20, 5},
+       {1},
        {10, 10, 10},
        {20}
   };
@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
   connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
   timer->start(1000/120); // это важно
-  spawnTimer->start(500);
+  spawnTimer->start(1000);
 
 
 }

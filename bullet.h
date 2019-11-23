@@ -18,7 +18,6 @@ public slots:
   void move();
 private:
   bool canDealDamage = true;
-  qreal Vo;
   QTimer *moveTimer;
   QPointF originPos;
   QPointF destination;
@@ -26,10 +25,15 @@ private:
   QChar type;
   qreal radiusOfTower;
   qreal damage;
-  qreal Vx, Vy;
-  double flightTime = 0;
+  QLineF overallDistance;
   double launchTime;
-  double time;
+  QPointF lastPos;
+  qreal dx, dy;
+  qreal Vox, Voy;
+  qreal Vo;
+  //double alpha;
+  double flightTime = 0;
+  double elapsedTime;
 };
 
 #endif // BULLET_H

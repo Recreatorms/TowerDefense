@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     bullet.cpp \
+    friendlynpc.cpp \
     gamescene.cpp \
     interface.cpp \
     main.cpp \
@@ -27,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     bullet.h \
+    friendlynpc.h \
     gamescene.h \
     interface.h \
     mainwindow.h \

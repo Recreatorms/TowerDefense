@@ -24,7 +24,8 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type, qreal _
     }
     if (type == '4') {
         attackRadius = _radius*3.1;
-        reloadSpeed = 1;
+        reloadSpeed = 500;
+        reloading = 255;
         damage = 1;
     }
     QTimer *attackTimer;
@@ -49,9 +50,9 @@ void Tower::attackTarget(QPointF destination) {
   Bullet *bullet = new Bullet(this, centerOfTower, destination, type, attackArea->rect().width()/2, damage);
   bullet->setPos(centerOfTower);
 
-  QLineF line(QPointF(centerOfTower), attackDest);
-  double angle = -1 *(line.angle());
-  bullet->setRotation(angle);
+//  QLineF line(QPointF(centerOfTower), attackDest);
+//  double angle = -1 *(line.angle());
+//  bullet->setRotation(angle);
   this->scene()->addItem(bullet);
 }
 
@@ -87,7 +88,7 @@ void Tower::acquireTarget() {
         qreal thisDist = distanceTo(collidingUnits[i]);
         if (thisDist < closestDist) {
             closestDist = thisDist;
-            closestPoint = collidingUnits[i]->pos();
+            closestPoint = QPointF(collidingUnits[i]->x(), collidingUnits[i]->y());
             hasTarget = true;
         }
     }
