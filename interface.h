@@ -3,17 +3,18 @@
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
-
+#include <QPushButton>
 class Interface : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Interface(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type);
+    explicit Interface(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type);
     ~Interface() {}
     bool selectingMode = false;
-    QChar typeOfTower;
+    QString typeOfTower;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -22,7 +23,7 @@ protected:
 private:
     QPixmap *spriteImage;
     QPointF pos1, pos2;
-    QChar type;
+    QString type;
 };
 
 #endif // INTERFACE_H

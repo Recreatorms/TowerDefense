@@ -34,14 +34,14 @@ public:
     void addInterface();
 
     void addTile(QPointF pos1, QPointF pos2, QChar type);
-    void addUnit(QPointF _start, int startPos);
-    void addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius);
+    void addUnit(QPointF _start, int startPos, QString type);
+    void addTower(QPointF pos1, QPointF pos2, QString type, qreal radius);
 
     void makeWavePath();
 
     QGraphicsItem* getItem(size_t x, size_t y); // зачем?
     int currentWave = 0;
-    int wave = 0;
+    int startingPoint = 0;
     bool selectingMode = false;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);

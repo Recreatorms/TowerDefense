@@ -1,6 +1,6 @@
 #include "interface.h"
-
-Interface::Interface(QObject *parent, QPointF _pos1, QPointF _pos2, QChar _type) :
+#include <QPushButton>
+Interface::Interface(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type) :
         QObject(parent), QGraphicsItem()
 {
     pos1 = _pos1;
@@ -20,20 +20,67 @@ void Interface::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   painter->setPen(Qt::black);
 
   painter->setFont(QFont("Comic Sans MS", 25,-1,false));
-  if (type == '1'){
-    painter->drawText(QPointF(pos2.x()-200,pos2.y()-50), "sampleText1");
+  if (type == "Musketeer"){
+    painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Musketeer");
   }
-  if (type == '2'){
-    painter->drawText(QPointF(pos2.x()-200,pos2.y()-50), "sampleText2");
+  if (type == "Rapid"){
+    painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Rapid");
   }
-  if (type == '3'){
-    painter->drawText(QPointF(pos2.x()-200,pos2.y()-50), "sampleText3");
+  if (type == "Archer"){
+    painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Archer");
   }
-  if (type == '4'){
-    painter->drawText(QPointF(pos2.x()-200,pos2.y()-50), "sampleText4");
-  }  if (type == 'u'){
-      painter->setBrush(Qt::DiagCrossPattern);
+  if (type == "Support"){
+    painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Support");
   }
+  if (type == "Info") {
+      if (typeOfTower == "Musketeer") {
+        painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Musketeer");
+        // dmg
+        // range
+        // speed
+        // SellPrice
+        // UpgradePrice
+        // sell button
+        // upgrade button
+      }
+      if (typeOfTower == "Rapid") {
+        painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Rapid");
+        // dmg
+        // range
+        // speed
+        // SellPrice
+        // UpgradePrice
+        // sell button
+        // upgrade button
+      }
+      if (typeOfTower == "Archer") {
+        painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Archer");
+        // dmg
+        // range
+        // speed
+        // SellPrice
+        // UpgradePrice
+        // sell button
+        // upgrade button
+      }
+      if (typeOfTower == "Support") {
+      painter->drawText(QPointF(pos2.x()-250,pos2.y()-50), "Support");
+        // dmg
+        // hp
+        // numberOfDefenders
+        // speed
+        // SellPrice
+        // UpgradePrice
+        // reroute button
+            //QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"ROUTE", this->scene());
+
+        // sell button
+        // upgrade button
+    }
+  }
+//  if (type == "Upgrade"){
+//      painter->setBrush(Qt::DiagCrossPattern);
+//  }
 
   painter->drawRect(QRectF(pos1,pos2));
   Q_UNUSED(option)
@@ -42,21 +89,21 @@ void Interface::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
 void Interface::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
-  if (type == '1') {
+  if (type == "Musketeer") {
     selectingMode = true;
-    typeOfTower = '1';
+    typeOfTower = "Musketeer";
   }
-  if (type == '2') {
+  if (type == "Rapid") {
     selectingMode = true;
-    typeOfTower = '2';
+    typeOfTower = "Rapid";
   }
-  if (type == '3') {
+  if (type == "Archer") {
     selectingMode = true;
-    typeOfTower = '3';
+    typeOfTower = "Archer";
   }
-  if (type == '3') {
+  if (type == "Support") {
     selectingMode = true;
-    typeOfTower = '4';
+    typeOfTower = "Support";
   }
 
 }

@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 //  ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 //  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
 
   size_t width = 8;
   std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/

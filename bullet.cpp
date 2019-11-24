@@ -2,8 +2,8 @@
 #include <QPixmap>
 #include <QTimer>
 #include <qmath.h>
-const qreal g = 9.8 * 100;
-Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QChar _type, qreal _radiusOfTower, qreal _damage) :
+const qreal g = 10 * 150;
+Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QString _type, qreal _radiusOfTower, qreal _damage) :
   QObject(parent)
 {
     setPixmap(QPixmap("../TowerDefense/images/bullet.png"));
@@ -15,14 +15,13 @@ Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QCha
     radiusOfTower = _radiusOfTower;
     damage = _damage;
     overallDistance = QLineF(originPos,destination);
-    if (type == '4') {
-      flightTime = overallDistance.length()/radiusOfTower; //  seconds
-      Vo = sqrt(g*radiusOfTower);
+    if (type == "Archer") {
+      flightTime = overallDistance.length()/radiusOfTower - 0.2; //  seconds
       double dx = overallDistance.dx(),
              dy = -overallDistance.dy();
       Vox = dx/flightTime;
       Voy = (dy + g*pow(flightTime,2)*0.5)/flightTime;
-
+      Vo = sqrt(Vox*Vox+Voy*Voy);
       elapsedTime = 0;
       launchTime = 10; // milliseconds
     }
@@ -38,9 +37,9 @@ Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QCha
 void Bullet::move()
 {
   double alpha = -overallDistance.angle();
-  if (type == '4') {
+  if (type == "Archer") {
     lastPos = QPointF(originPos.rx() + dx, originPos.ry() - dy);
-    elapsedTime += launchTime/1000;
+    elapsedTime += launchTime*0.001;
     dx = Vox*elapsedTime;
     dy = Voy*elapsedTime - g*pow(elapsedTime,2)*0.5;
     setPos(originPos.rx() + dx, originPos.ry() - dy);
@@ -55,7 +54,7 @@ void Bullet::move()
 /////   Замедление стрелы
 /////   if (type == ....) { ...
   QLineF distance(originPos,pos());
-  if  (distance.length() > radiusOfTower)
+  if  (distance.length() > radiusOfTower && type != "Archer")
     Vo = Vo * 0.1;
   if (Vo < 0.3) {
       setOpacity(opacity()-0.15);

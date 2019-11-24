@@ -53,27 +53,42 @@ void GameScene::setGameOptions(QVector<QVector<size_t> > _number) {
 
 void GameScene::addInterface() {
     // List of Towers
-    for (int i = 0; i < 4; i++) {
-        QPointF pos1(square*(width+1)/2, -square*(height)/2+i*square),
-                pos2(square*(width+10)/2,-square*(height)/2+(i+1)*square);
-        QChar type = i + 1 + '0';
-        Interface *interface = new Interface(this, pos1, pos2, type);
+    // "Musketeer" // lvl 4 (archer) or mage
+        QPointF pos1(square*(width+1)/2, -square*(height)/2+0*square),
+                pos2(square*(width+10)/2,-square*(height)/2+(0+1)*square);
+        Interface *interface = new Interface(this, pos1, pos2, "Musketeer");
         this->addItem(interface);
         interfaces.push_back(interface);
-        this->setFocusItem(interface);
-    }
+
+    // Rapid // mage or artillery
+        pos1 = QPointF(square*(width+1)/2, -square*(height)/2+1*square);
+        pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(1+1)*square);
+        interface = new Interface(this, pos1, pos2, "Rapid");
+        this->addItem(interface);
+        interfaces.push_back(interface);
+    // Archer
+        pos1 = QPointF(square*(width+1)/2, -square*(height)/2+2*square);
+        pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(2+1)*square);
+        interface = new Interface(this, pos1, pos2, "Archer");
+        this->addItem(interface);
+        interfaces.push_back(interface);
+    // Support
+        pos1 = QPointF(square*(width+1)/2, -square*(height)/2+3*square);
+        pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(3+1)*square);
+        interface = new Interface(this, pos1, pos2, "Support");
+        this->addItem(interface);
+        interfaces.push_back(interface);
+
     // Upgrade Menu
-    QPointF pos1(square*(width+1)/2, -square*(height)/2+4*square),
-            pos2(square*(width+10)/2,-square*(height)/2+6*square);
-    QChar type = 'u';
-    Interface *interface = new Interface(this, pos1, pos2, type);
+    pos1 = QPointF(square*(width+1)/2, -square*(height)/2+4*square);
+    pos2 = QPointF(square*(width+10)/2,-square*(height)/2+6*square);
+    interface = new Interface(this, pos1, pos2, "Upgrade");
     this->addItem(interface);
     interfaces.push_back(interface);
     // Info Menu
     pos1 = QPointF(square*(width+1)/2, -square*(height)/2+6*square);
     pos2 = QPointF(square*(width+10)/2,square*(height)/2);
-    type = 'i';
-    interface = new Interface(this, pos1, pos2, type);
+    interface = new Interface(this, pos1, pos2, "Info");
     this->addItem(interface);
     interfaces.push_back(interface);
 
@@ -102,24 +117,24 @@ void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
 
 }
 
-void GameScene::addUnit(QPointF _start, int _startPos) {
-  Unit *unit = new Unit(this, _start, _startPos);
-  qreal speed = 2;
-  unit->setOptions(1/speed,3,1); // speed/hp/attackPower
+void GameScene::addUnit(QPointF _start, int _startPos, QString type) {
+  Unit *unit = new Unit(this, _start, _startPos, type, path);
+  qreal speed = 1;
+  unit->setOptions(1/speed, 5,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
   for (int i = 0; i < towers.size(); i++)
       towers[i]->updateUnits(units);
 }
 
-void GameScene::addTower(QPointF pos1, QPointF pos2, QChar type, qreal radius) {
+void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius) {
   QTransform trans;
   QList<QGraphicsItem*> items = this->items((pos1+pos2)/2);
   Tile *tile = nullptr;
   for (int i = 0; i < items.size(); i++)
     tile= static_cast<Tile*>(items[i]);
   if (!tile->hasTower) {
-    Tower *tower = new Tower(this, pos1, pos2, type, radius, units);
+    Tower *tower = new Tower(this, pos1, pos2, type, radius, units, interfaces);
     this->addItem(tower);
     towers.push_back(tower);
     tile->hasTower = true;
@@ -136,14 +151,15 @@ void GameScene::spawnUnit() {
         this->addText("victory",QFont("Comic Sans MS", 40,-1,false));
         return;
     }
-    if (currentWave < numberOfUnitsToSpawn[wave].size() && numberOfUnitsToSpawn[wave][currentWave] != 0) {
-         this->addUnit(path[wave][0], wave);
-         numberOfUnitsToSpawn[wave][currentWave]--;
+    if (currentWave < numberOfUnitsToSpawn[startingPoint].size() && numberOfUnitsToSpawn[startingPoint][currentWave] != 0) {
+        QString type = "default";
+         this->addUnit(path[startingPoint][0], startingPoint, type);
+         numberOfUnitsToSpawn[startingPoint][currentWave]--;
     } else {
-         if (currentWave + 1 <= numberOfUnitsToSpawn[wave].size() && units.size() == 0) {
+         if (currentWave < numberOfUnitsToSpawn[startingPoint].size() && units.size() == 0) {
              currentWave++;
-             if (currentWave == numberOfUnitsToSpawn[wave].size() && wave + 1 < numberOfUnitsToSpawn.size()) {
-                wave++;
+             if (currentWave == numberOfUnitsToSpawn[startingPoint].size() && startingPoint + 1 < numberOfUnitsToSpawn.size()) {
+                startingPoint++;
                 currentWave = 0;
              }
          }
@@ -180,8 +196,8 @@ void GameScene::gameTimerSlot() {
                     } else
                         units.pop_back();
                     }
-                    for (int i = 0; i < towers.size(); i++)
-                        towers[i]->updateUnits(units);
+                    for (int t = 0; t < towers.size(); t++)
+                        towers[t]->updateUnits(units);
                 }
             }
         }
@@ -196,7 +212,7 @@ void GameScene::gameTimerSlot() {
 void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if(playerHP != 0) { // Если игрок ещё не проиграл
     // Выбрать башню для постройки
-   QChar type;
+   QString type;
    for (int i = 0; i < interfaces.size(); i++)
       if (interfaces[i]->selectingMode) {
          selectingMode = true;
