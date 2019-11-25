@@ -120,7 +120,7 @@ void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
 void GameScene::addUnit(QPointF _start, int _startPos, QString type) {
   Unit *unit = new Unit(this, _start, _startPos, type, path);
   qreal speed = 1;
-  unit->setOptions(1/speed, 5,1); // speed/hp/attackPower
+  unit->setOptions(1/speed, 10,1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
   for (int i = 0; i < towers.size(); i++)

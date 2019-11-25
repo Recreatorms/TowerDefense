@@ -37,11 +37,11 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     attackArea->setPos(((pos1+pos2)/2)-attackArea->rect().center());
     } else {
         numberOfNPCs = 1;
-        respawning = 3;
-        respawnTimer = 3;
+        respawning = 3000;
+        respawnTimer = 3000;
         respawn = false;
         QTimer *spawnNPCtimer = new QTimer();
-        spawnNPCtimer->start(1000);
+        spawnNPCtimer->start(1);
         connect(spawnNPCtimer, &QTimer::timeout, this, &Tower::spawnNPC);
 
       }

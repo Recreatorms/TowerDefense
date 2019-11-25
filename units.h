@@ -25,6 +25,7 @@ public:
     int damage;
     int reloading = 0;
     int cooldown;
+    int maxHP;
     int hp;
     int attackBaseValue;
     bool isBlocked;
@@ -36,9 +37,11 @@ protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 private:
-    QGraphicsItem *item;
+   // QGraphicsItem *item;
 //    int offset;
+    int dx = 0;
     qreal speed;
+    QPixmap *spriteImage;
     QVector<QVector<QPointF> > path;
     QString type;
 };

@@ -6,7 +6,7 @@
 
 #include <QTimer>
 #include <QPainter>
-
+#include <QPen>
 #include "qmath.h"
 #include "units.h"
 
@@ -35,14 +35,22 @@ private:
     bool readyToStrike;
     QPointF routePoint;
     QPointF spawnPoint;
+
+    int maxHP;
+    int hpRegen = 1;
+    int regenSpeed;
+    int regenerating = 0;
+
     int damage;
     int coolDown;
     int reloading;
     int checkRadius;
-    int currentEnemy;
+
+//    int currentEnemy;
     qreal dx = 0, dy = 0;
-    QList<Unit*> collidingUnits;
+//    QList<Unit*> collidingUnits;
     QVector<Unit*> units;
+    Unit* currentEnemy;
     QPixmap *spriteImage;
 };
 

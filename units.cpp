@@ -23,18 +23,23 @@ Unit::~Unit(){
 void Unit::setOptions(qreal _speed, int _hp, int _attackBaseValue)
 {
   speed = _speed;
+  maxHP = _hp;
   hp = _hp;
   attackBaseValue = _attackBaseValue;
 
 }
 
 void Unit::moveTo(QPointF point) {
+  this->reloading++;
   if (!isBlocked) {
-    if (x() < point.x() && y() == point.y()) //right
+    if (x() < point.x() && y() == point.y())  {//right
+      dx = speed;
       setPos(mapToScene(speed,0));
-    else if (x() > point.x() && y() == point.y()) //left
-     setPos(mapToScene(-speed,0));
-
+      }
+    else if (x() > point.x() && y() == point.y()) { //left
+        dx = -speed;
+        setPos(mapToScene(-speed,0));
+      }
     if (x() == point.x() && y() < point.y()) //down
      setPos(mapToScene(0,speed));
     else if (x() == point.x() && y() > point.y()) //up
@@ -53,22 +58,33 @@ void Unit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 ////////////////////////////Graphics/////////////////////////
 QRectF Unit::boundingRect() const
 {
-    return QRectF(-20,-20,40,40); // иначе говоря хитбокс
+    return QRectF(-50,-50,100,100); // иначе говоря хитбокс
 }
 
 void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QPolygon polygon;
-    polygon << QPoint(-20, -20) <<  QPoint(-20, 20) << QPoint(20, 20) << QPoint(20,-20);// << QPoint(0,-40);
-//    if (hp <= 4)
-//        painter->setBrush(Qt::blue);
-    if (hp <= 3)
-        painter->setBrush(Qt::green);
-    if (hp <= 2)
-        painter->setBrush(Qt::yellow);
-    if (hp == 1)
-        painter->setBrush(Qt::red);
-    painter->drawPolygon(polygon);
+//    QPolygon polygon;
+//    polygon << QPoint(-20, -20) <<  QPoint(-20, 20) << QPoint(20, 20) << QPoint(20,-20);// << QPoint(0,-40);
+    QPen pen;
+    pen.setWidth(10);
+    pen.setColor(Qt::red);
+    painter->setPen(pen);
+    painter->drawLine(-30,-45,30,-45);
+    pen.setColor(Qt::green);
+    painter->setPen(pen);
+    painter->drawLine(-30,-45, 60/maxHP*hp-30,-45);
+
+    painter->setPen(Qt::PenStyle::SolidLine);
+
+    if (dx <= 0) {
+      QTransform transf = painter->transform();
+      transf.scale(-1,1);
+      painter->setTransform(transf);
+    }
+    spriteImage = new QPixmap("../TowerDefense/images/enemy.png");
+    painter->drawPixmap(boundingRect(), *spriteImage, QRectF(QPointF(0,0),QPointF(200,200)));
+
+//    painter->drawPolygon(polygon);
     Q_UNUSED(option)
     Q_UNUSED(widget)
 }
