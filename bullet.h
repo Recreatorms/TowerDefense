@@ -11,7 +11,7 @@ class Bullet : public QObject, public QGraphicsPixmapItem
 {
   Q_OBJECT
 public:
-  Bullet(QObject * parent, QPointF _originPos, QPointF _destination, QString _type, qreal _radiusOfTower, qreal _damage);
+  Bullet(QObject * parent, QPointF _originPos, QPointF _destination, /*QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage);
   ~Bullet() override {
     moveTimer->~QTimer();}
 public slots:
@@ -22,9 +22,11 @@ private:
   QPointF originPos;
   QPointF destination;
 
+//  QVector<Unit*> units;
+
   QString type;
   qreal radiusOfTower;
-  qreal damage;
+  int damage;
   QLineF overallDistance;
   double launchTime;
   QPointF lastPos;

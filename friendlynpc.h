@@ -35,6 +35,7 @@ private:
     bool readyToStrike;
     QPointF routePoint;
     QPointF spawnPoint;
+    QString type;
 
     int maxHP;
     int hpRegen = 1;

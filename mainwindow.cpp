@@ -16,7 +16,6 @@ MainWindow::MainWindow(QWidget *parent)
   ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 //  ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 //  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
 
   size_t width = 8;
   std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
@@ -46,20 +45,29 @@ MainWindow::MainWindow(QWidget *parent)
 
   gameScene->setGameOptions(numberOfUnitsToSpawn);
   gameScene->makeWavePath();
+  QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
 
   timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
-  spawnTimer = new QTimer();
-  connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
   connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
   timer->start(1000/120); // это важно
-  spawnTimer->start(1000);
+  connect(changeRoute, &QPushButton::clicked, this, &MainWindow::launch);
 
 
 }
 
 MainWindow::~MainWindow()
 {
-  delete ui;
+    delete ui;
+}
+
+void MainWindow::launch()
+{
+    if (!launched) {
+        spawnTimer = new QTimer();
+        connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
+        spawnTimer->start(1000);
+        launched = true;
+    }
 }
 
 

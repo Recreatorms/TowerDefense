@@ -20,7 +20,9 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 public slots:
+  void launch();
 private:
+  bool launched = false;
   Ui::MainWindow * ui;
   QTimer         * timer;
   QTimer         * spawnTimer;

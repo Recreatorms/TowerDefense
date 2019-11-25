@@ -92,18 +92,22 @@ void Interface::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (type == "Musketeer") {
     selectingMode = true;
     typeOfTower = "Musketeer";
+    this->update();
   }
   if (type == "Rapid") {
     selectingMode = true;
     typeOfTower = "Rapid";
+    this->update();
   }
   if (type == "Archer") {
     selectingMode = true;
     typeOfTower = "Archer";
+    this->update();
   }
   if (type == "Support") {
     selectingMode = true;
     typeOfTower = "Support";
+    this->update();
   }
-
+  Q_UNUSED(event)
 }

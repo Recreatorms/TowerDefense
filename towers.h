@@ -37,6 +37,7 @@ public:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
+    int price;
 
     qreal damage;
     int attackSpeed;

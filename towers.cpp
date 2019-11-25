@@ -22,7 +22,7 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     if (type == "Rapid") { // delet dis
         attackRadius = _radius*1.1;
         reloadSpeed = 100;
-        damage = 0.3;
+        damage = 1;
     }
     if (type == "Archer") {
         attackRadius = _radius*1.6;
@@ -63,7 +63,7 @@ qreal Tower::distanceTo(QGraphicsItem *item)
 
 void Tower::attackTarget(QPointF destination) {
   QPointF centerOfTower((pos1+pos2)/2);
-  Bullet *bullet = new Bullet(this, centerOfTower, destination, type, attackArea->rect().width()/2, damage);
+  Bullet *bullet = new Bullet(this, centerOfTower, destination, /*units,*/ type, attackArea->rect().width()/2, damage);
 //  bullet->setPos(centerOfTower);
   this->scene()->addItem(bullet);
 }
@@ -74,6 +74,7 @@ void Tower::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
   if (type == "Support") {
     interfaces[5]->typeOfTower = "Support";
   }
+  Q_UNUSED(mouseEvent)
 }
 
 void Tower::acquireTarget() {
@@ -157,7 +158,6 @@ void Tower::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWi
       painter->drawPixmap(QPointF(pos1.x(),pos1.y()-33), *spriteImage, QRectF(QPointF(0,0),QPointF(200,200)));
     } else {
       painter->drawRoundedRect(QRectF(pos1,pos2), 100, 100, Qt::AbsoluteSize);
-      painter->drawLine(QLineF((pos1+pos2)/2,QPointF((pos1.x()+pos2.x())/2,((pos1.y()+pos2.y()))/2-50)));
     }
   Q_UNUSED(option)
   Q_UNUSED(widget)

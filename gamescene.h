@@ -39,7 +39,8 @@ public:
 
     void makeWavePath();
 
-    QGraphicsItem* getItem(size_t x, size_t y); // зачем?
+//    QGraphicsItem* getItem(size_t x, size_t y); // зачем?
+
     int currentWave = 0;
     int startingPoint = 0;
     bool selectingMode = false;

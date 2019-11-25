@@ -30,6 +30,10 @@ public:
     int attackBaseValue;
     bool isBlocked;
 
+    int goldValue;
+
+
+
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 //public slots:
 //    void completePath();

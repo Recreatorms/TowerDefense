@@ -40,11 +40,11 @@ void GameScene::setGameOptions(QVector<QVector<size_t> > _number) {
     for (size_t j = 0; j < width; j++) {
       if (map[i][j] == 's') {
           start.push_back(QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square));
-          getItem(j,i)->setOpacity(0.2);
+//          getItem(j,i)->setOpacity(0.2);
       }
       if (map[i][j] == 'e') {
           end = QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square);
-          getItem(j,i)->setOpacity(0.2);
+//          getItem(j,i)->setOpacity(0.2);
       }
     }
   numberOfUnitsToSpawn = _number;
@@ -94,20 +94,20 @@ void GameScene::addInterface() {
 
 }
 
-QGraphicsItem* GameScene::getItem(size_t x, size_t y) { // Зачем мне нужен этот метод??????????
-  QPointF pos1(-square/2*width + x*square, -square/2*height +y*square);
-  for (qreal i = 0; i < square*height; i+=square) // потом поменять на int
-    for (qreal j = 0; j < square*width; j +=square) {
-        QPointF pos2(-square/2*width+j, -square/2*height+i);
-    if (pos1 == pos2) {
-        QTransform trans;
-        QGraphicsItem* item = this->itemAt(pos1, trans);
-        if (item != nullptr)
-            return item;
-      }
-    }
-  return nullptr;
-}
+//QGraphicsItem* GameScene::getItem(size_t x, size_t y) { // Зачем мне нужен этот метод??????????
+//  QPointF pos1(-square/2*width + x*square, -square/2*height +y*square);
+//  for (qreal i = 0; i < square*height; i+=square) // потом поменять на int
+//    for (qreal j = 0; j < square*width; j +=square) {
+//        QPointF pos2(-square/2*width+j, -square/2*height+i);
+//    if (pos1 == pos2) {
+//        QTransform trans;
+//        QGraphicsItem* item = this->itemAt(pos1, trans);
+//        if (item != nullptr)
+//            return item;
+//      }
+//    }
+//  return nullptr;
+//}
 
 
 
@@ -120,7 +120,7 @@ void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
 void GameScene::addUnit(QPointF _start, int _startPos, QString type) {
   Unit *unit = new Unit(this, _start, _startPos, type, path);
   qreal speed = 1;
-  unit->setOptions(1/speed, 10,1); // speed/hp/attackPower
+  unit->setOptions(1/speed, 6, 1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
   for (int i = 0; i < towers.size(); i++)
@@ -217,6 +217,8 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       if (interfaces[i]->selectingMode) {
          selectingMode = true;
          type = interfaces[i]->typeOfTower;
+         interfaces[5]->typeOfTower = type;
+         interfaces[5]->update();
          break;
       }
       else
@@ -233,6 +235,8 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
 
                                 addTower(pos1,pos2, type, 3);
+                                interfaces[5]->typeOfTower = "default";
+                                interfaces[5]->update();
                                 for (int k = 0; k < interfaces.size(); k++)
                                   interfaces[k]->selectingMode = false;
                                 break;

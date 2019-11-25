@@ -3,13 +3,14 @@
 #include <QTimer>
 #include <qmath.h>
 const qreal g = 10 * 150;
-Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QString _type, qreal _radiusOfTower, qreal _damage) :
+Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination,/* QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage) :
   QObject(parent)
 {
     setPixmap(QPixmap("../TowerDefense/images/bullet.png"));
     originPos = _originPos;
     setPos(originPos);
     setRotation(-90);
+//    units = _units;
     destination = _destination;
     type = _type;
     radiusOfTower = _radiusOfTower;
@@ -26,8 +27,14 @@ Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination, QStr
       launchTime = 10; // milliseconds
     }
     else {
-        Vo = 1;
-        launchTime = 1;
+        if (type == "Musketeer") {
+            Vo = 5;
+            launchTime = 1;
+        }
+        if (type == "Rapid") {
+            Vo = 1;
+            launchTime = 1;
+        }
     }
     moveTimer = new QTimer();
     connect(moveTimer, &QTimer::timeout, this, &Bullet::move);
@@ -51,8 +58,7 @@ void Bullet::move()
     setPos(x() + dx, y() + dy);
     setRotation(-QLineF(lastPos, pos()).angle());
   }
-/////   Замедление стрелы
-/////   if (type == ....) { ...
+
   QLineF distance(originPos,pos());
   if  (distance.length() > radiusOfTower && type != "Archer")
     Vo = Vo * 0.1;
@@ -62,8 +68,21 @@ void Bullet::move()
   }
   if (opacity()== 0.0)
       this->~Bullet();
-  QLineF line(pos(),destination);
-  if (line.length() < 50) { // небольшая оптимизация
+
+  QLineF distanceToTarget(this->pos(), destination);
+////  if (distanceToTarget.length() <= 10) {
+//     for (int i = 0; i < units.size(); i++) {
+//         qreal length = QLineF(this->pos(),units[i]->pos()).length();
+//         if (length <= 10 && canDealDamage) {
+//            units[i]->hp -= damage;
+//            canDealDamage = false;
+//            setOpacity(0);
+//            break;
+//         }
+//     }
+////  }
+//  QLineF line(pos(),destination);
+  if (distanceToTarget.length() < 50) { // небольшая оптимизация
       QList<QGraphicsItem*> collidingItem = collidingItems();
       for(int i = 0; i < collidingItem.size(); i++){
         Unit *unit = dynamic_cast<Unit*>(collidingItem[i]);

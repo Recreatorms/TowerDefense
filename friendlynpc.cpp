@@ -4,19 +4,25 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
     QObject(parent), QGraphicsItem()
 {
     spawnPoint = _spawnPoint;
+    setPos(spawnPoint);
+
     units = _units;
+    currentEnemy = nullptr;
     routePoint = _routePoint;
     blockingAnEnemy = false;
     readyToStrike = false;
-    reloading = 0;
-    maxHP = 5;
-    hp = maxHP;
-    regenSpeed = 5000;
+
+    type = _type;
     //if (type == ...) {
+      maxHP = 5;
+      hp = maxHP;
+      regenSpeed = 3000;
+
+      reloading = 0;
       checkRadius = 101;
       damage = 1;
       coolDown = 250;
-      setPos(spawnPoint);
+
 
     QTimer *checkingTimer = new QTimer();
     checkingTimer->start(1);
@@ -24,13 +30,14 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
 }
 
 void FriendlyNPC::moveTo(QPointF pos) {
-    qreal Vo = 0.25,
-          alpha = -QLineF(this->pos(), pos).angle();
+    qreal Vo = 0.25;
+    QLineF distance(this->pos(), pos);
+    qreal alpha = -distance.angle();
     dx = Vo * qCos(qDegreesToRadians(alpha));
     dy = Vo * qSin(qDegreesToRadians(alpha));
     setPos(x() + dx, y() + dy);
 
-    if (this->pos() == routePoint)
+    if (distance.length() <= 1)
       readyToStrike = true;
 }
 
@@ -62,9 +69,10 @@ void FriendlyNPC::attackEnemy(Unit* enemy) {
       if (this->hp <= 0)
           enemy->isBlocked = false;
       if (enemy->hp <= 0) {
-//        blockingAnEnemy = false;
         readyToStrike = false;
         currentEnemy = nullptr;
+      }
+//        blockingAnEnemy = false;
 //        if (collidingUnits.indexOf(enemy) == collidingUnits.size() - 1)
 //          collidingUnits.pop_back();
 //        else {
@@ -76,7 +84,6 @@ void FriendlyNPC::attackEnemy(Unit* enemy) {
 //          } else
 //            collidingUnits.pop_back();
 //        }
-      }
 //    enemy->blocked = true;
 //    enemy->hp -=damage;
 //    if (enemy->cooldown == enemy->attackSpeed) {
@@ -98,7 +105,7 @@ void FriendlyNPC::checkForEnemies() {
           if (hp < maxHP) {
             if (regenerating >= regenSpeed) {
               hp += hpRegen;
-              regenerating = 4000;
+              regenerating = 2500;
             } else regenerating++;
             this->update();
           } else
