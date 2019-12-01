@@ -7,18 +7,18 @@
 #include "units.h"
 #include "tile.h"
 #include <QTimer>
+#include <QThread>
 class Bullet : public QObject, public QGraphicsPixmapItem
 {
   Q_OBJECT
 public:
   Bullet(QObject * parent, QPointF _originPos, QPointF _destination, /*QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage);
-  ~Bullet() override {
-    moveTimer->~QTimer();}
+  ~Bullet() {}
 public slots:
   void move();
 private:
   bool canDealDamage = true;
-  QTimer *moveTimer;
+//  QTimer *moveTimer;
   QPointF originPos;
   QPointF destination;
 

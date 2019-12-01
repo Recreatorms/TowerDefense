@@ -170,6 +170,18 @@ void GameScene::spawnUnit() {
 
 void GameScene::gameTimerSlot() {
    if (playerHP != 0) {
+       for (int i = 0; i < interfaces.size(); i++)
+          if (interfaces[i]->selectingMode) {
+             selectingMode = true;
+             typeOfSelectedTower = interfaces[i]->typeOfTower;
+             break;
+          }
+          else
+             selectingMode = false;
+       interfaces[5]->typeOfTower = typeOfSelectedTower;
+       interfaces[5]->update();
+
+
     for(int k = 0; k < start.size(); k++) {
         for (int i = 0; i < units.size(); i++) {
             if(units[i]->startPos == k) {
@@ -204,6 +216,9 @@ void GameScene::gameTimerSlot() {
     }
       } else {
         this->addText("ggwp",QFont("Comic Sans MS", 40,-1,false));
+//        for(int i = 0; i < towers.size(); i++)
+//          towers[i]->~Tower();
+
         return;
       }
 }
@@ -212,31 +227,20 @@ void GameScene::gameTimerSlot() {
 void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if(playerHP != 0) { // Если игрок ещё не проиграл
     // Выбрать башню для постройки
-   QString type;
-   for (int i = 0; i < interfaces.size(); i++)
-      if (interfaces[i]->selectingMode) {
-         selectingMode = true;
-         type = interfaces[i]->typeOfTower;
-         interfaces[5]->typeOfTower = type;
-         interfaces[5]->update();
-         break;
-      }
-      else
-         selectingMode = false;
+
 
     // Выбрать определенный тайл
     if (selectingMode)
-    for (int i = 0; i < height; i++)
-        for (int j = 0; j < width; j++)
+    for (size_t i = 0; i < height; i++)
+        for (size_t j = 0; j < width; j++)
                     if (map[i][j] == 'b') {
                         QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
                                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
 
-                                addTower(pos1,pos2, type, 3);
-                                interfaces[5]->typeOfTower = "default";
-                                interfaces[5]->update();
+                                addTower(pos1,pos2, typeOfSelectedTower, 3);
+                                typeOfSelectedTower = "default";
                                 for (int k = 0; k < interfaces.size(); k++)
                                   interfaces[k]->selectingMode = false;
                                 break;
@@ -314,52 +318,4 @@ void GameScene::makeWavePath() {
     }
 }
 
-
-//void Background::makePath(QPointF currentPoint) { // путь строится правильно,  но перемещение сделано не правильно
-//  path.push_back(currentPoint);
-//  if (currentPoint != end) {
-//        size_t x = currentPoint.x()/square + m/2,  // столбик
-//               y = currentPoint.y()/square + m/2;     // строка
-//        QPointF newPoint;
-//        if (x!=m-1) { // right
-//            if(map[y][x+1] == 'r' || map[y][x+1] == 'e') {
-//              newPoint = QPointF(currentPoint.x() + square,currentPoint.y());
-//              if (!path.contains(newPoint))
-//                 //if (newPoint != end)
-//                    makePath(newPoint);
-//              }
-//        }
-//        if(x!=0) { // left
-//            if(map[y][x-1] == 'r' || map[y][x-1] == 'e') {
-//              newPoint = QPointF(currentPoint.x() - square, currentPoint.y());
-//             if (!path.contains(newPoint))
-//                 //if (newPoint != end)
-//                    makePath(newPoint);
-//            }
-//        }
-//        if(y!=m-1) { // down
-//            if(map[y+1][x] == 'r' || map[y+1][x] == 'e') {
-//              newPoint = QPointF(currentPoint.x(),currentPoint.y() + square);
-//              if (!path.contains(newPoint))
-//                // if (newPoint != end)
-//                   makePath(newPoint);
-//              }
-//        }
-//        if(y!=0) { // up
-//            if(map[y-1][x] == 'r' || map[y-1][x] == 'e') {
-//              newPoint = QPointF(currentPoint.x(),currentPoint.y() - square);
-//              if (!path.contains(newPoint))
-//                // if (newPoint != end)
-//                    makePath(newPoint);
-//              }
-//        }
-//    }
-//}
-
-
-
-
-//Unit* Background::getUnit(int x, int y) {
-
-//}
 

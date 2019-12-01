@@ -22,6 +22,7 @@ SOURCES += \
     interface.cpp \
     main.cpp \
     mainwindow.cpp \
+    mythread.cpp \
     tile.cpp \
     towers.cpp \
     units.cpp
@@ -32,6 +33,7 @@ HEADERS += \
     gamescene.h \
     interface.h \
     mainwindow.h \
+    mythread.h \
     tile.h \
     towers.h \
     units.h \

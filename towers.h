@@ -4,20 +4,26 @@
 #include <QObject>
 #include <QGraphicsItem>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsScene>
 
 #include <QGraphicsSceneMouseEvent>
 #include <QMouseEvent>
-#include <QTimer>
+
 #include <QPainter>
 #include <QBrush>
 #include <QPen>
-#include <QGraphicsScene>
 
+
+#include <QTimer>
+#include "mythread.h"
+#include <QtDebug>
 #include "bullet.h"
 #include "units.h"
 #include "tile.h"
 #include "friendlynpc.h"
 #include "interface.h"
+
+
 class Tower : public QObject, public QGraphicsItem
 {
    Q_OBJECT
@@ -44,6 +50,8 @@ public:
 public slots:
     void acquireTarget();
     void spawnNPC();
+signals:
+    void spawned();
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
@@ -54,7 +62,6 @@ private:
     QVector<Interface *> interfaces;
     QString type;
     qreal attackRadius;
-
     bool onCooldown;
     int reloadSpeed;
     int reloading;
@@ -64,6 +71,12 @@ private:
     int respawnTimer;
     int respawning;
     bool respawn;
+
+//    QThread *threadthread = new QThread();
+  //  MyThread *myThread;
+    QTimer *attackTimer;
+    QTimer *actionTimer;
+    QTimer *spawnNPCtimer;
 
     QPointF attackDest;
     QGraphicsEllipseItem * attackArea;

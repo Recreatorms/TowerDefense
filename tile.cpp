@@ -13,6 +13,14 @@ Tile::~Tile()
 
 }
 
+void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (hasTower)
+      return;
+    else if (towerSelected)
+      hasTower = true;
+}
+
 QRectF Tile::boundingRect() const {
     return QRectF(pos1,pos2);
 }
@@ -26,3 +34,5 @@ void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     Q_UNUSED(option)
     Q_UNUSED(widget)
 }
+
+

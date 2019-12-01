@@ -6,6 +6,7 @@ const qreal g = 10 * 150;
 Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination,/* QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage) :
   QObject(parent)
 {
+
     setPixmap(QPixmap("../TowerDefense/images/bullet.png"));
     originPos = _originPos;
     setPos(originPos);
@@ -36,9 +37,7 @@ Bullet::Bullet(QObject * parent, QPointF _originPos,  QPointF _destination,/* QV
             launchTime = 1;
         }
     }
-    moveTimer = new QTimer();
-    connect(moveTimer, &QTimer::timeout, this, &Bullet::move);
-    moveTimer->start(launchTime);
+
 }
 
 void Bullet::move()

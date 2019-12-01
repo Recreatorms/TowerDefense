@@ -13,22 +13,33 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     onCooldown = true;
     reloading = 0;
     attackRadius = 1;
+
+
+
+
     if (type != "Support") {
+        actionTimer = new QTimer();
     if (type == "Musketeer") {
-      attackRadius = _radius*2.1;
-      reloadSpeed = 1000;
-      damage = 2;
+        attackRadius = _radius*2.1;
+        reloadSpeed = 1000;
+        damage = 2;
+
+        actionTimer->start(1);
     }
     if (type == "Rapid") { // delet dis
         attackRadius = _radius*1.1;
         reloadSpeed = 100;
         damage = 1;
+
+        actionTimer->start(1);
     }
     if (type == "Archer") {
         attackRadius = _radius*1.6;
         reloadSpeed = 500;
         reloading = 255;
         damage = 1;
+
+        actionTimer->start(10);
     }
     QTimer *attackTimer = new QTimer();
     attackTimer->start(1);
@@ -40,9 +51,13 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
         respawning = 3000;
         respawnTimer = 3000;
         respawn = false;
+
+
+
         QTimer *spawnNPCtimer = new QTimer();
         spawnNPCtimer->start(1);
         connect(spawnNPCtimer, &QTimer::timeout, this, &Tower::spawnNPC);
+//        connect(this, &Tower::spawned, spawnNPCtimer, &QTimer::stop);
 
       }
 }
@@ -61,20 +76,14 @@ qreal Tower::distanceTo(QGraphicsItem *item)
   return line.length();
 }
 
+
+
 void Tower::attackTarget(QPointF destination) {
   QPointF centerOfTower((pos1+pos2)/2);
   Bullet *bullet = new Bullet(this, centerOfTower, destination, /*units,*/ type, attackArea->rect().width()/2, damage);
 //  bullet->setPos(centerOfTower);
   this->scene()->addItem(bullet);
-}
-
-void Tower::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
-{
-  //Interface *info;
-  if (type == "Support") {
-    interfaces[5]->typeOfTower = "Support";
-  }
-  Q_UNUSED(mouseEvent)
+  connect(actionTimer, &QTimer::timeout, bullet, &Bullet::move);
 }
 
 void Tower::acquireTarget() {
@@ -84,7 +93,7 @@ void Tower::acquireTarget() {
         reloading++;
         return;
     }
-  //QList<QGraphicsItem *> collidingItems = attackArea->collidingItems();
+
   QPointF centerOfAttackArea(attackArea->pos()+attackArea->rect().center());
   QList<Unit*>  collidingUnits;
   for (int i = 0; i < units.size(); i++) {
@@ -92,11 +101,7 @@ void Tower::acquireTarget() {
       if (line.length() < attackRadius*50 && !collidingUnits.contains(units[i]))
           collidingUnits.push_back(units[i]);
   }
-//  for (int i = 0; i < collidingUnits.size(); i++) {
-//      QLineF line(collidingUnits[i]->pos(),centerOfAttackArea);
-//      if (line.length() > attackRadius*50*2.1 || collidingUnits[i]->hp == 0)
-//          collidingUnits.pop_front();
-//  }
+
   hasTarget = false;
   if (collidingUnits.size() == 0) {
     hasTarget = false;
@@ -135,16 +140,49 @@ void Tower::spawnNPC()
     respawning++;
   if (npcs.size() < numberOfNPCs && respawnTimer <= respawning) {
      respawn = false;
-     QPointF centerOfTower((pos1+pos2)/2);
-     QPointF route(centerOfTower.x()-100, centerOfTower.y());
-     FriendlyNPC *npc = new FriendlyNPC(this, centerOfTower, route, "default", units);
-     npcs.push_back(npc);
-     this->scene()->addItem(npc);
+      spawnFriendlyNPC();
   }
 }
 
+void Tower::spawnFriendlyNPC()
+{
+  QPointF centerOfTower((pos1+pos2)/2);
+  QPointF route(centerOfTower.x()-100, centerOfTower.y());
+  qDebug() << "Tower:\t" <<this->thread();
 
 
+//   qDebug() << myThread->thread();
+
+  FriendlyNPC *npc = new FriendlyNPC(nullptr, centerOfTower, route, "default", units);
+//  emit spawned();
+//  thread->start();
+  //this->thread()->exit();
+  MyThread *myThread = new MyThread(nullptr/*this->thread()->thread()*/);
+  npc->moveToThread(myThread);
+  qDebug() << "NPC:\t"<< npc->thread();
+  connect(myThread, &MyThread::signalStartTimer, npc, &FriendlyNPC::checkForEnemies);
+  myThread->start();
+//  actionTimer = new QTimer(nullptr);
+//  actionTimer->moveToThread(thread);
+//  actionTimer->setInterval(1);
+// connect(actionTimer, &QTimer::timeout, npc, &FriendlyNPC::checkForEnemies);
+//  thread->quit();
+//  actionTimer->start();
+
+  npcs.push_back(npc);
+  //thread->exit();
+  this->scene()->addItem(npc);
+//  spawnNPCtimer->start(1);
+  //  emit spawned();
+}
+
+void Tower::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
+{
+  if (type == "Support") {
+    interfaces[5]->typeOfTower = "Support";
+  }
+  Q_UNUSED(mouseEvent)
+}
 
 ////////// Графика ///////////////////////
 QRectF Tower::boundingRect() const

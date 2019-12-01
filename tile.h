@@ -5,6 +5,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QBrush>
+#include <QGraphicsSceneMouseEvent>
 
 class Tile: public QObject, public QGraphicsItem
 {
@@ -14,9 +15,11 @@ public:
     ~Tile();
     QChar type;
     bool hasTower = false;
+    bool towerSelected = false;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
     QPixmap *spriteImage;
     QPointF pos1, pos2;

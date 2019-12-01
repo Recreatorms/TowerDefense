@@ -5,7 +5,6 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
 {
     spawnPoint = _spawnPoint;
     setPos(spawnPoint);
-
     units = _units;
     currentEnemy = nullptr;
     routePoint = _routePoint;
@@ -24,9 +23,9 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
       coolDown = 250;
 
 
-    QTimer *checkingTimer = new QTimer();
-    checkingTimer->start(1);
-    connect(checkingTimer, &QTimer::timeout, this, &FriendlyNPC::checkForEnemies);
+//    checkingTimer = new QTimer();
+//    checkingTimer->start(100);
+//    connect(checkingTimer, &QTimer::timeout, this, &FriendlyNPC::checkForEnemies);
 }
 
 void FriendlyNPC::moveTo(QPointF pos) {

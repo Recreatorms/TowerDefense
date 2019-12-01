@@ -4,12 +4,13 @@
 #include <QObject>
 #include <QGraphicsItem>
 
-#include <QTimer>
+
 #include <QPainter>
 #include <QPen>
 #include "qmath.h"
 #include "units.h"
-
+#include <QtConcurrent/QtConcurrentRun>
+#include <QThreadPool>
 class FriendlyNPC : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -25,6 +26,8 @@ public:
 
     bool blockingAnEnemy;
     int hp;
+
+
 public slots:
     void checkForEnemies();
 protected:
@@ -49,9 +52,11 @@ private:
 
 //    int currentEnemy;
     qreal dx = 0, dy = 0;
-//    QList<Unit*> collidingUnits;
+
     QVector<Unit*> units;
     Unit* currentEnemy;
+
+
     QPixmap *spriteImage;
 };
 

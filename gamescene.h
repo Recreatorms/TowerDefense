@@ -45,6 +45,7 @@ public:
     int startingPoint = 0;
     bool selectingMode = false;
 
+    QString typeOfSelectedTower;
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
 public slots:

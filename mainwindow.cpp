@@ -4,6 +4,8 @@
 #include <QGraphicsView>
 #include <QGraphicsItem>
 #include <vector>
+extern void addUnit(QPointF _start, int startPos, QString type);
+
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
@@ -34,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
   };
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {1},
+       {10},
        {10, 10, 10},
        {20}
   };
@@ -46,12 +48,15 @@ MainWindow::MainWindow(QWidget *parent)
   gameScene->setGameOptions(numberOfUnitsToSpawn);
   gameScene->makeWavePath();
   QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
-
   timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
   connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
   timer->start(1000/120); // это важно
   connect(changeRoute, &QPushButton::clicked, this, &MainWindow::launch);
-
+//  QThreadPool pool;
+//  QPointF _start;
+//  int startPos;
+//  QString type;
+//  QFuture<void> future = QtConcurrent::run(&pool, addUnit, _start, startPos, type);
 
 }
 

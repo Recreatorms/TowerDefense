@@ -109,5 +109,6 @@ void Interface::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     typeOfTower = "Support";
     this->update();
   }
+
   Q_UNUSED(event)
 }
