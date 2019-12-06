@@ -135,6 +135,33 @@ void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius)
     tile= static_cast<Tile*>(items[i]);
   if (!tile->hasTower) {
     Tower *tower = new Tower(this, pos1, pos2, type, radius, units, interfaces);
+
+    if (type == "Support") {
+        std::thread([tower]()
+        {
+            Signal sig;
+            connect(&sig, &Signal::sig, tower, &Tower::spawnNPC);
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                emit sig.sig();
+            }
+         /*doSOMEJOB*/
+        }
+        ).detach();
+    } else {
+        std::thread([tower]()
+        {
+            Signal sig;
+            connect(&sig, &Signal::sig, tower, &Tower::acquireTarget);
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                emit sig.sig();
+            }
+         /*doSOMEJOB*/
+        }
+        ).detach();
+    }
+
     this->addItem(tower);
     towers.push_back(tower);
     tile->hasTower = true;
@@ -170,6 +197,7 @@ void GameScene::spawnUnit() {
 
 void GameScene::gameTimerSlot() {
    if (playerHP != 0) {
+       //this->addText(this->playerHP,QFont("Comic Sans MS", 40,-1,false));
        for (int i = 0; i < interfaces.size(); i++)
           if (interfaces[i]->selectingMode) {
              selectingMode = true;

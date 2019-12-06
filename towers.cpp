@@ -15,23 +15,24 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     attackRadius = 1;
 
 
+//    QTimer *actionTimer = new QTimer();
 
 
     if (type != "Support") {
-        actionTimer = new QTimer();
+//        connect(actionTimer, &QTimer::timeout, this, &Tower::acquireTarget);
     if (type == "Musketeer") {
         attackRadius = _radius*2.1;
         reloadSpeed = 1000;
         damage = 2;
 
-        actionTimer->start(1);
+//        actionTimer->start(1);
     }
     if (type == "Rapid") { // delet dis
         attackRadius = _radius*1.1;
         reloadSpeed = 100;
         damage = 1;
 
-        actionTimer->start(1);
+//        actionTimer->start(1);
     }
     if (type == "Archer") {
         attackRadius = _radius*1.6;
@@ -39,14 +40,13 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
         reloading = 255;
         damage = 1;
 
-        actionTimer->start(10);
+//        actionTimer->start(10);
     }
-    QTimer *attackTimer = new QTimer();
-    attackTimer->start(1);
-    connect(attackTimer, &QTimer::timeout, this, &Tower::acquireTarget);
+//    actionTimer->start(1);
     attackArea = new QGraphicsEllipseItem(QRectF(pos1*attackRadius,pos2*attackRadius),this);
     attackArea->setPos(((pos1+pos2)/2)-attackArea->rect().center());
     } else {
+//        connect(actionTimer, &QTimer::timeout, this, &Tower::spawnNPC);
         numberOfNPCs = 1;
         respawning = 3000;
         respawnTimer = 3000;
@@ -54,9 +54,7 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
 
 
 
-        QTimer *spawnNPCtimer = new QTimer();
-        spawnNPCtimer->start(1);
-        connect(spawnNPCtimer, &QTimer::timeout, this, &Tower::spawnNPC);
+//        actionTimer->start(1);
 //        connect(this, &Tower::spawned, spawnNPCtimer, &QTimer::stop);
 
       }
@@ -82,8 +80,19 @@ void Tower::attackTarget(QPointF destination) {
   QPointF centerOfTower((pos1+pos2)/2);
   Bullet *bullet = new Bullet(this, centerOfTower, destination, /*units,*/ type, attackArea->rect().width()/2, damage);
 //  bullet->setPos(centerOfTower);
+//  connect(actionTimer, &QTimer::timeout, bullet, &Bullet::move);
+  std::thread([bullet]()
+    {
+      Signal sig;
+      connect(&sig, &Signal::sig, bullet, &Bullet::move);
+      while (true) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(bullet->launchTime));
+          emit sig.sig();
+      }
+       /*doSOMEJOB*/
+    }
+  ).detach();
   this->scene()->addItem(bullet);
-  connect(actionTimer, &QTimer::timeout, bullet, &Bullet::move);
 }
 
 void Tower::acquireTarget() {
@@ -148,7 +157,7 @@ void Tower::spawnFriendlyNPC()
 {
   QPointF centerOfTower((pos1+pos2)/2);
   QPointF route(centerOfTower.x()-100, centerOfTower.y());
-  qDebug() << "Tower:\t" <<this->thread();
+//  qDebug() << "Tower:\t" <<this->thread();
 
 
 //   qDebug() << myThread->thread();
@@ -157,11 +166,23 @@ void Tower::spawnFriendlyNPC()
 //  emit spawned();
 //  thread->start();
   //this->thread()->exit();
-  MyThread *myThread = new MyThread(nullptr/*this->thread()->thread()*/);
-  npc->moveToThread(myThread);
-  qDebug() << "NPC:\t"<< npc->thread();
-  connect(myThread, &MyThread::signalStartTimer, npc, &FriendlyNPC::checkForEnemies);
-  myThread->start();
+  std::thread([npc]()
+    {
+      Signal sig;
+      connect(&sig, &Signal::sig, npc, &FriendlyNPC::checkForEnemies);
+      while (true) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          emit sig.sig();
+      }
+       /*doSOMEJOB*/
+    }
+  ).detach();
+
+//  MyThread *myThread = new MyThread(nullptr/*this->thread()->thread()*/);
+//  npc->moveToThread(myThread);
+//  qDebug() << "NPC:\t"<< npc->thread();
+//  connect(myThread, &MyThread::signalStartTimer, npc, &FriendlyNPC::checkForEnemies);
+//  myThread->start();
 //  actionTimer = new QTimer(nullptr);
 //  actionTimer->moveToThread(thread);
 //  actionTimer->setInterval(1);

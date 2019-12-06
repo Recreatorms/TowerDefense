@@ -14,6 +14,7 @@ class Bullet : public QObject, public QGraphicsPixmapItem
 public:
   Bullet(QObject * parent, QPointF _originPos, QPointF _destination, /*QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage);
   ~Bullet() {}
+  int launchTime;
 public slots:
   void move();
 private:
@@ -28,7 +29,6 @@ private:
   qreal radiusOfTower;
   int damage;
   QLineF overallDistance;
-  double launchTime;
   QPointF lastPos;
   qreal dx, dy;
   qreal Vox, Voy;

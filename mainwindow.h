@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QTimer>
 #include <QMouseEvent>
-
+#include "mythread.h"
 #include "gamescene.h"
 
 QT_BEGIN_NAMESPACE

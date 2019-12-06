@@ -12,7 +12,8 @@
 #include <QPainter>
 #include <QBrush>
 #include <QPen>
-
+#include <thread>
+#include <chrono>
 
 #include <QTimer>
 #include "mythread.h"
@@ -74,9 +75,9 @@ private:
 
 //    QThread *threadthread = new QThread();
   //  MyThread *myThread;
-    QTimer *attackTimer;
     QTimer *actionTimer;
-    QTimer *spawnNPCtimer;
+//    QTimer *spawnNPCtimer;
+//    QTimer *attackTimer;
 
     QPointF attackDest;
     QGraphicsEllipseItem * attackArea;

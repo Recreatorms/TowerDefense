@@ -4,6 +4,14 @@
 #include <QObject>
 #include <QThread>
 #include <QTimer>
+
+class Signal : public QObject
+{
+    Q_OBJECT
+signals:
+    void sig();
+};
+
 class MyThread : public QThread
 {
   Q_OBJECT

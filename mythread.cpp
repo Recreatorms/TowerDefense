@@ -38,4 +38,5 @@ void MyThread::doIt() {
 //void MyThread::slotStartTimer() {
 //  threadTimer->start(1);
 //}
-
+int p;
+//std::thread([&p](){std::this_thread::sleep_for(std::chrono::milliseconds(10); /*doSOMEJOB*/}).detach();
