@@ -6,7 +6,6 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
-
 #include <QPushButton>
 class Interface : public QObject, public QGraphicsItem
 {
@@ -15,13 +14,32 @@ public:
     explicit Interface(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type);
     ~Interface() {}
     bool selectingMode = false;
+    QString typeOfEntity;
     QString typeOfTower;
+    QString typeOfUnit;
+    bool unitWasSelected = false;
+    int hp;
+    int dmg;
+    int attackSpeed;
+    int attackBase;
+    int radius;
+    int movementSpeed;
+
+    int price;
+
+    int playerMoney;
+    void addGameInfo(int _hp, int _waveNumber, int _playerMoney);
+    void entityInfo(int _hp, int _dmg, int _attackBase, int _radius, int _attackSpeed, int _movementSpeed, int _price );
+    void upgrade();
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    int playerHP;
+    int waveNumber;
     QPixmap *spriteImage;
     QPointF pos1, pos2;
     QString type;

@@ -9,25 +9,66 @@ GameScene::GameScene() :
 GameScene::~GameScene() {
 }
 
-void GameScene::fillMap(size_t _width, std::vector<std::vector<char> > p) {
+void GameScene::fillMap(size_t _width, std::vector<std::vector<QString> > p) {
     map = std::move(p);
     height = map.size();
     width =  _width;
 }
 
-void GameScene::createMap() {
+void GameScene::createMap(QString _backgroundTheme) {
+  backgroundTheme = _backgroundTheme;
+  QString type;
+  int rotation;
   this->setSceneRect(QRectF(QPointF(-square,-square),QPointF(square,square)));
   for (size_t i = 0; i < height; i++) // потом поменять на int
     for (size_t j = 0; j < width; j++) {
         QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
-        this->addTile(pos1, pos2, map[i][j]);
+        type = "/layers/";
+        if (map[i][j] == "b")
+          type += "dot.png";
+        else
+        if (map[i][j] == "r") {
+            type += "road_";
+            if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i][j+1] == 'r')
+              type += "5.png";
+            else
+            if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i-1][j] == 'r' && map[i+1][j] == 'r')
+              type += "6.png";
+          }
+
+        this->addTile(pos1, pos2, type);
     }
+  // turn tiles
+  for (size_t i = 0; i < height; i++) {
+      for (size_t j = 0; j < width; j++) {
+          if (map[i][j] == "r") {
+            QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
+                    pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
+            type = "/layers/road_";
+          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j+1] == 'r' && map[i+1][j] == 'r')
+            type += "1.png";
+          else
+          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i+1][j] == 'r')
+            type += "2.png";
+          else
+          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j+1] == 'r' && map[i-1][j] == 'r')
+            type += "3.png";
+          else
+          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i-1][j] == 'r')
+            type += "4.png";
+          this->addTile(pos1, pos2, type);
+          }
+    }
+  }
+
+
+
  // Background Texture
   QString path;
-  path = ("../TowerDefense/images/Preview.png");
+  path = ("../TowerDefense/images/Map/game_background_"+backgroundTheme+"/layers/land.png");
   QPixmap bg(path);
-  bg = bg.scaled(QGraphicsScene::height(), QGraphicsScene::height(), Qt::KeepAspectRatioByExpanding,Qt::FastTransformation);
+  bg = bg.scaled(QGraphicsScene::width(), QGraphicsScene::height(), Qt::KeepAspectRatioByExpanding,Qt::FastTransformation);
   QPalette palette;
   palette.setBrush(QPalette::Background, bg);
   this->setPalette(palette);
@@ -35,18 +76,22 @@ void GameScene::createMap() {
 
 }
 
-void GameScene::setGameOptions(QVector<QVector<size_t> > _number) {
+
+void GameScene::setGameOptions(QVector<QVector<size_t> > _number, int _playerMoney) {
   for (size_t i = 0; i < height; i++)
     for (size_t j = 0; j < width; j++) {
-      if (map[i][j] == 's') {
+      if (map[i][j] == "s") {
           start.push_back(QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square));
+          map[i][j] = "r";
 //          getItem(j,i)->setOpacity(0.2);
       }
-      if (map[i][j] == 'e') {
+      if (map[i][j] == "e") {
           end = QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square);
 //          getItem(j,i)->setOpacity(0.2);
+          map[i][j] = "r";
       }
     }
+  playerMoney = _playerMoney;
   numberOfUnitsToSpawn = _number;
 }
 
@@ -60,19 +105,19 @@ void GameScene::addInterface() {
         this->addItem(interface);
         interfaces.push_back(interface);
 
-    // Rapid // mage or artillery
+    // Rapid // mage or artillery or superarcher
         pos1 = QPointF(square*(width+1)/2, -square*(height)/2+1*square);
         pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(1+1)*square);
         interface = new Interface(this, pos1, pos2, "Rapid");
         this->addItem(interface);
         interfaces.push_back(interface);
-    // Archer
+    // Archer or artillery
         pos1 = QPointF(square*(width+1)/2, -square*(height)/2+2*square);
         pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(2+1)*square);
         interface = new Interface(this, pos1, pos2, "Archer");
         this->addItem(interface);
         interfaces.push_back(interface);
-    // Support
+    // Support // spawns defenders
         pos1 = QPointF(square*(width+1)/2, -square*(height)/2+3*square);
         pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(3+1)*square);
         interface = new Interface(this, pos1, pos2, "Support");
@@ -89,6 +134,7 @@ void GameScene::addInterface() {
     pos1 = QPointF(square*(width+1)/2, -square*(height)/2+6*square);
     pos2 = QPointF(square*(width+10)/2,square*(height)/2);
     interface = new Interface(this, pos1, pos2, "Info");
+    interface->addGameInfo(this->playerHP, currentWave, playerMoney);
     this->addItem(interface);
     interfaces.push_back(interface);
 
@@ -111,30 +157,30 @@ void GameScene::addInterface() {
 
 
 
-void GameScene::addTile(QPointF pos1, QPointF pos2, QChar type) {
-  Tile *tile = new Tile(this, pos1, pos2, type);
+void GameScene::addTile(QPointF pos1, QPointF pos2, QString type) {
+  Tile *tile = new Tile(this, pos1, pos2, backgroundTheme, type);
   this->addItem(tile);
 
 }
 
 void GameScene::addUnit(QPointF _start, int _startPos, QString type) {
-  Unit *unit = new Unit(this, _start, _startPos, type, path);
-  qreal speed = 1;
-  unit->setOptions(1/speed, 6, 1); // speed/hp/attackPower
+  Unit *unit = new Unit(this, _start, _startPos, type, path, interfaces);
+  int speed = 1;
+  unit->setOptions(speed, 10, 1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
   for (int i = 0; i < towers.size(); i++)
       towers[i]->updateUnits(units);
 }
 
-void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius) {
+void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius, int price) {
   QTransform trans;
   QList<QGraphicsItem*> items = this->items((pos1+pos2)/2);
   Tile *tile = nullptr;
   for (int i = 0; i < items.size(); i++)
     tile= static_cast<Tile*>(items[i]);
   if (!tile->hasTower) {
-    Tower *tower = new Tower(this, pos1, pos2, type, radius, units, interfaces);
+    Tower *tower = new Tower(this, pos1, pos2, type, radius, price, units, interfaces);
 
     if (type == "Support") {
         std::thread([tower]()
@@ -166,7 +212,7 @@ void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius)
     towers.push_back(tower);
     tile->hasTower = true;
   } else
-    this->addText("can't place same tower on same tile",QFont("Comic Sans MS", 40,-1,false));
+    this->addText("can't place same tower on same tile", QFont("Comic Sans MS", 40,-1,false));
 
 
 }
@@ -179,6 +225,8 @@ void GameScene::spawnUnit() {
         return;
     }
     if (currentWave < numberOfUnitsToSpawn[startingPoint].size() && numberOfUnitsToSpawn[startingPoint][currentWave] != 0) {
+        interfaces[5]->addGameInfo(this->playerHP, 0/*startingPoint*currentWave+1*/, this->playerMoney);
+        interfaces[5]->update();
         QString type = "default";
          this->addUnit(path[startingPoint][0], startingPoint, type);
          numberOfUnitsToSpawn[startingPoint][currentWave]--;
@@ -197,19 +245,34 @@ void GameScene::spawnUnit() {
 
 void GameScene::gameTimerSlot() {
    if (playerHP != 0) {
-       //this->addText(this->playerHP,QFont("Comic Sans MS", 40,-1,false));
-       for (int i = 0; i < interfaces.size(); i++)
-          if (interfaces[i]->selectingMode) {
-             selectingMode = true;
-             typeOfSelectedTower = interfaces[i]->typeOfTower;
-             break;
+//       this->addText(QString::number(this->playerHP),QFont("Comic Sans MS", 40,-1,false));
+
+
+       QString selectedUnit;
+       for (int i = 0; i < units.size(); i++)
+          if(units[i]->clicked) {
+            selectedUnit = units[i]->type;
+            interfaces[5]->typeOfEntity = "Unit";
+            interfaces[5]->typeOfUnit = selectedUnit;
+            interfaces[5]->entityInfo(units[i]->hp, units[i]->damage, units[i]->attackBaseValue, 0, units[i]->cooldown, units[i]->speed, 0);
+            interfaces[5]->update();
+            break;
           }
+
+       for (int i = 0; i < 4; i++) {
+           if (interfaces[i]->selectingMode) {
+             selectingTower = true;
+             interfaces[5]->typeOfEntity = "Tower";
+             selectedTower = interfaces[i]->typeOfTower;
+             indexOfSelectedTower = i;
+             interfaces[5]->typeOfTower = selectedTower;
+             interfaces[5]->entityInfo(interfaces[i]->hp, interfaces[i]->dmg, 0, interfaces[i]->radius, interfaces[i]->attackSpeed, 0, interfaces[i]->price);
+             interfaces[5]->update();
+             break;
+          }/*
           else
-             selectingMode = false;
-       interfaces[5]->typeOfTower = typeOfSelectedTower;
-       interfaces[5]->update();
-
-
+             selectingTower = false;*/
+         }
     for(int k = 0; k < start.size(); k++) {
         for (int i = 0; i < units.size(); i++) {
             if(units[i]->startPos == k) {
@@ -222,7 +285,10 @@ void GameScene::gameTimerSlot() {
                 if(units[i]->pos() == end || units[i]->hp <= 0) {
                     if (units[i]->pos() == end)
                       playerHP -= units[i]->attackBaseValue;
-
+                    if (units[i]->hp <= 0)
+                      playerMoney += 10;
+                    interfaces[5]->addGameInfo(this->playerHP, 0, this->playerMoney);
+                    interfaces[5]->update();
                     int index = i;
                     units[i]->~Unit();
                     if (index == units.size()-1)
@@ -258,22 +324,28 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
 
     // Выбрать определенный тайл
-    if (selectingMode)
     for (size_t i = 0; i < height; i++)
-        for (size_t j = 0; j < width; j++)
-                    if (map[i][j] == 'b') {
+        for (size_t j = 0; j < width; j++) {
+
                         QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
                                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
 
-                                addTower(pos1,pos2, typeOfSelectedTower, 3);
-                                typeOfSelectedTower = "default";
-                                for (int k = 0; k < interfaces.size(); k++)
+                            if (selectingTower && map[i][j] == 'b' && playerMoney >= interfaces[indexOfSelectedTower]->price) {
+                                addTower(pos1,pos2, selectedTower, 3, interfaces[indexOfSelectedTower]->price);
+                                playerMoney -= interfaces[indexOfSelectedTower]->price;
+                                selectingTower = false;
+                            }
+                                interfaces[5]->typeOfEntity = "default";
+                                interfaces[5]->playerMoney = playerMoney;
+                                interfaces[5]->update();
+                                for (int k = 0; k < 4; k++)
                                   interfaces[k]->selectingMode = false;
                                 break;
-                        }
+
                     }
+          }
   }
 }
 
@@ -284,7 +356,7 @@ void GameScene::makeWavePath() {
     std::vector<std::vector<int> > labyrinth (height, std::vector<int> (width));
     for(size_t i = 0; i < height; i++)
         for (size_t j = 0; j < width; j++)
-          if (map[i][j] == 'b')
+          if (map[i][j] == 'b' || map[i][j] == '0')
               labyrinth[i][j] = WALL;
             else if (map[i][j] == 'r' || map[i][j] == 'e' || map[i][j] == 's')
               labyrinth[i][j] = BLANK;

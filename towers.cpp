@@ -1,12 +1,12 @@
 #include "towers.h"
 
-Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal _radius, QVector<Unit*> _units, QVector<Interface *> _interfaces) :
+Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal _radius, int _price, QVector<Unit*> _units, QVector<Interface *> _interfaces) :
              QObject(parent), QGraphicsItem()
 {
     pos1 = _pos1;
     pos2 = _pos2;
- //   setPos(_pos1-_pos2);
     type = _type;
+    price = _price;
     units = _units;
     interfaces = _interfaces;
     hasTarget = false;
@@ -23,13 +23,15 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     if (type == "Musketeer") {
         attackRadius = _radius*2.1;
         reloadSpeed = 1000;
-        damage = 2;
+        reloading = reloadSpeed/2;
+        damage = 3;
 
 //        actionTimer->start(1);
     }
     if (type == "Rapid") { // delet dis
         attackRadius = _radius*1.1;
         reloadSpeed = 100;
+        reloading = reloadSpeed/2;
         damage = 1;
 
 //        actionTimer->start(1);
@@ -37,14 +39,15 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
     if (type == "Archer") {
         attackRadius = _radius*1.6;
         reloadSpeed = 500;
-        reloading = 255;
-        damage = 1;
+        reloading = reloadSpeed/2;
+        damage = 2;
 
 //        actionTimer->start(10);
     }
 //    actionTimer->start(1);
-    attackArea = new QGraphicsEllipseItem(QRectF(pos1*attackRadius,pos2*attackRadius),this);
-    attackArea->setPos(((pos1+pos2)/2)-attackArea->rect().center());
+    attackArea = new QGraphicsEllipseItem(QRectF(pos1*attackRadius,pos2*attackRadius), this);
+    attackArea->setPos((pos1+pos2)/2-attackArea->rect().center());
+    attackArea->hide();
     } else {
 //        connect(actionTimer, &QTimer::timeout, this, &Tower::spawnNPC);
         numberOfNPCs = 1;
@@ -58,6 +61,7 @@ Tower::Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal
 //        connect(this, &Tower::spawned, spawnNPCtimer, &QTimer::stop);
 
       }
+//    setPos((_pos1+_pos2)/2);
 }
 void Tower::updateUnits(QVector<Unit *> _units) {
     units = _units;
@@ -162,7 +166,7 @@ void Tower::spawnFriendlyNPC()
 
 //   qDebug() << myThread->thread();
 
-  FriendlyNPC *npc = new FriendlyNPC(nullptr, centerOfTower, route, "default", units);
+  FriendlyNPC *npc = new FriendlyNPC(nullptr, centerOfTower, route, "default", units, interfaces);
 //  emit spawned();
 //  thread->start();
   //this->thread()->exit();
@@ -199,25 +203,51 @@ void Tower::spawnFriendlyNPC()
 
 void Tower::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-  if (type == "Support") {
-    interfaces[5]->typeOfTower = "Support";
-  }
-  Q_UNUSED(mouseEvent)
+    interfaces[5]->typeOfEntity = "Tower";
+    interfaces[5]->typeOfTower = type;
+    if (this->type != "Support") {
+        if (!attackArea->isVisible())
+          attackArea->show();
+        else
+          attackArea->hide();
+        interfaces[5]->entityInfo(0, this->damage, 0, this->attackRadius, this->reloadSpeed, 0, this->price);
+    } else
+        interfaces[5]->entityInfo(this->npcs[0]->maxHP, this->npcs[0]->damage, 0, 0, this->npcs[0]->coolDown, 0, this->price);
+    interfaces[5]->update();
+
+    Q_UNUSED(mouseEvent)
+}
+
+void Tower::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+//  if (this->type != "Support")
+//      attackArea->hide();
 }
 
 ////////// Графика ///////////////////////
 QRectF Tower::boundingRect() const
 {
-  return QRectF(pos1,pos2);
+  return QRectF(pos1, pos2);
 }
 
 void Tower::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-  if (type ==  "Musketeer" || type == "Rapid" || type == "Archer" /*|| type == "Support"*/) {
-      spriteImage = new QPixmap("../TowerDefense/images/archer_tower.png");
-      painter->drawPixmap(QPointF(pos1.x(),pos1.y()-33), *spriteImage, QRectF(QPointF(0,0),QPointF(200,200)));
-    } else {
-      painter->drawRoundedRect(QRectF(pos1,pos2), 100, 100, Qt::AbsoluteSize);
+  if (type == "Archer" /*|| type == "Support"*/) {
+//      spriteImage = new QPixmap("../TowerDefense/images/Towers/Archer/61.png");
+//      painter->drawPixmap(QPointF(boundingRect().x(), boundingRect().y()-100), *spriteImage, spriteImage->rect());
+      spriteImage = new QPixmap("../TowerDefense/images/Towers/Archer/6.png");
     }
+     else
+      if (type == "Rapid")
+          spriteImage = new QPixmap("../TowerDefense/images/Towers/Archer/2.png");
+     else
+      if (type == "Musketeer")
+          spriteImage = new QPixmap("../TowerDefense/images/Towers/Archer/12.png");
+     else
+      if (type == "Support")
+        spriteImage = new QPixmap("../TowerDefense/images/Towers/Support/5.png");
+
+
+  painter->drawPixmap(boundingRect(), *spriteImage, spriteImage->rect());
   Q_UNUSED(option)
   Q_UNUSED(widget)
 }

@@ -1,6 +1,6 @@
 #include "friendlynpc.h"
-#include <QEvent>
-FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units) :
+
+FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units, QVector<Interface *> _interfaces) :
     QObject(parent), QGraphicsItem()
 {
     spawnPoint = _spawnPoint;
@@ -10,10 +10,9 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
     routePoint = _routePoint;
     blockingAnEnemy = false;
     readyToStrike = false;
-
-    type = _type;
+    interfaces = _interfaces;
     //if (type == ...) {
-      maxHP = 5;
+      maxHP = 12;
       hp = maxHP;
       regenSpeed = 3000;
 
@@ -40,9 +39,26 @@ void FriendlyNPC::moveTo(QPointF pos) {
       readyToStrike = true;
 }
 
+void FriendlyNPC::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+  interfaces[5]->typeOfEntity = "Unit";
+  interfaces[5]->typeOfUnit = "Friendly";
+  interfaces[5]->entityInfo(this->hp, this->damage, 0, 0, this->coolDown, 0, 0);
+  interfaces[5]->update();
+  clicked = true;
+  Q_UNUSED(event)
+}
+
+void FriendlyNPC::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+  clicked = false;
+  Q_UNUSED(event)
+}
+
 
 void FriendlyNPC::attackEnemy(Unit* enemy) {
       if (enemy == nullptr) {
+          readyToStrike = false;
           moveTo(routePoint);
           return;
         }
@@ -166,7 +182,7 @@ QRectF FriendlyNPC::boundingRect() const
 
 void FriendlyNPC::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    spriteImage = new QPixmap("../TowerDefense/images/knight.png");
+    spriteImage = new QPixmap("../TowerDefense/images/Towers/Support/knight.png");
     // HP bar
     QPen pen;
     pen.setWidth(10);
@@ -185,7 +201,7 @@ void FriendlyNPC::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
     painter->setPen(Qt::PenStyle::NoPen);
 
-    painter->drawPixmap(boundingRect(), *spriteImage, QRectF(0,0,100,100));
+    painter->drawPixmap(boundingRect(), *spriteImage, spriteImage->rect());
     Q_UNUSED(option)
     Q_UNUSED(widget)
 }

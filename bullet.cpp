@@ -59,8 +59,13 @@ void Bullet::move()
   }
 
   QLineF distance(originPos,pos());
-  if  (distance.length() > radiusOfTower && type != "Archer")
-    Vo = Vo * 0.1;
+  if  (distance.length() > radiusOfTower) {
+    if (type != "Archer")
+      Vo = Vo * 0.1;
+    else
+      if (dy < 10)
+        Vo = Vo * 0.1;
+    }
   if (Vo < 0.3) {
       setOpacity(opacity()-0.15);
       canDealDamage = false;

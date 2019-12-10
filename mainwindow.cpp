@@ -20,32 +20,33 @@ MainWindow::MainWindow(QWidget *parent)
 //  ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
   size_t width = 8;
-  std::vector<std::vector<char> > p = /*(n, std::vector<int> (m));*/
+  std::vector<std::vector<QString> > p = /*(n, std::vector<int> (m));*/
   {
-        {'b', 'b', 'b', 'b', 'b', 's', 'b', 'b'},
-        {'s', 'r', 'b', 'r', 'r', 'r', 'b', 'b'},
-        {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'r', 'b', 'r', 'b', 'b', 'b', 'b'},
-        {'b', 'r', 'b', 'r', 'b', 'b', 'r', 's'},
-        {'b', 'r', 'r', 'r', 'b', 'b', 'r', 'b'},
-        {'b', 'b', 'b', 'r', 'b', 'b', 'r', 'b'},
-        {'b', 'b', 'b', 'r', 'b', 'b', 'r', 'b'},
-        {'b', 'e', 'r', 'r', 'r', 'r', 'r', 'b'},
-        {'b', 'b', 'b', 'b', 'b', 'b', 'b', 'b'},
+        {"0", "0", "0", "0", "0", "s", "0", "0"},
+        {"s", "r", "b", "r", "r", "r", "0", "0"},
+        {"0", "r", "b", "r", "b", "0", "0", "0"},
+        {"0", "r", "b", "r", "0", "0", "b", "0"},
+        {"0", "r", "b", "r", "b", "0", "r", "s"},
+        {"0", "r", "r", "r", "b", "0", "r", "b"},
+        {"0", "b", "b", "r", "0", "b", "r", "0"},
+        {"0", "0", "b", "r", "b", "0", "r", "b"},
+        {"0", "e", "r", "r", "r", "r", "r", "0"},
+        {"0", "0", "0", "0", "0", "0", "0", "0"},
 
   };
+  gameScene->fillMap(width, p);
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {10},
+       {1},
        {10, 10, 10},
        {20}
   };
+  QString backgroundTheme = "1";
   // теперь можно заполнить двумерный массив (вектор векторов)
-  gameScene->fillMap(width, p);
-  gameScene->createMap(); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
+  int _playerMoney = 500;
+  gameScene->setGameOptions(numberOfUnitsToSpawn, _playerMoney);
+  gameScene->createMap(backgroundTheme); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
   gameScene->addInterface();
-
-  gameScene->setGameOptions(numberOfUnitsToSpawn);
   gameScene->makeWavePath();
   QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
   timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
@@ -72,6 +73,8 @@ void MainWindow::launch()
         connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
         spawnTimer->start(1000);
         launched = true;
+    } else {
+
     }
 }
 

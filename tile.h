@@ -11,9 +11,9 @@ class Tile: public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Tile(QObject *parent, QPointF pos1, QPointF pos2, QChar type);
+    explicit Tile(QObject *parent, QPointF pos1, QPointF pos2, QString _backgroundTheme, QString _type);
     ~Tile();
-    QChar type;
+    QString type;
     bool hasTower = false;
     bool towerSelected = false;
 protected:
@@ -21,6 +21,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
+    QString backgroundTheme;
     QPixmap *spriteImage;
     QPointF pos1, pos2;
 };

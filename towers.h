@@ -29,7 +29,7 @@ class Tower : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString type, qreal radius, QVector<Unit*> _units, QVector<Interface *> _interfaces);
+    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal _radius, int _price, QVector<Unit*> _units, QVector<Interface *> _interfaces);
     ~Tower() {}
 
     void showRadius();
@@ -43,11 +43,11 @@ public:
 
 
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
     int price;
 
-    qreal damage;
-    int attackSpeed;
+    int damage;
 public slots:
     void acquireTarget();
     void spawnNPC();

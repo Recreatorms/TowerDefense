@@ -3,19 +3,20 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-
+#include <QGraphicsSceneMouseEvent>
+#include <QMouseEvent>
 
 #include <QPainter>
 #include <QPen>
+
 #include "qmath.h"
 #include "units.h"
-#include <QtConcurrent/QtConcurrentRun>
-#include <QThreadPool>
+
 class FriendlyNPC : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units);
+    explicit FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units, QVector<Interface *> _interfaces);
     ~FriendlyNPC() {}
 
     void attackEnemy(Unit* enemy);
@@ -25,9 +26,15 @@ public:
     void moveTo(QPointF pos);
 
     bool blockingAnEnemy;
+
+    int damage;
+    int coolDown;
+    int maxHP;
     int hp;
+    bool clicked = false;
 
-
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 public slots:
     void checkForEnemies();
 protected:
@@ -40,19 +47,15 @@ private:
     QPointF spawnPoint;
     QString type;
 
-    int maxHP;
     int hpRegen = 1;
     int regenSpeed;
     int regenerating = 0;
-
-    int damage;
-    int coolDown;
     int reloading;
     int checkRadius;
 
 //    int currentEnemy;
     qreal dx = 0, dy = 0;
-
+    QVector<Interface *> interfaces;
     QVector<Unit*> units;
     Unit* currentEnemy;
 

@@ -1,15 +1,16 @@
 #include "units.h"
 
 
-Unit::Unit(QObject *parent, QPointF _start, int _startPos, QString type, QVector<QVector<QPointF> > _path) :
+Unit::Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVector<QVector<QPointF> > _path, QVector<Interface *> _interfaces) :
   QObject(parent)
 {
+    interfaces = _interfaces;
     startPos = _startPos;
     currentPos = 0;
     path = _path;
     setPos(_start);
     isBlocked = false;
-
+    type = "enemy";
     damage = 1;
     cooldown = 100;
 //    QTimer *pathTimer = new QTimer();
@@ -20,7 +21,7 @@ Unit::Unit(QObject *parent, QPointF _start, int _startPos, QString type, QVector
 Unit::~Unit(){
 }
 
-void Unit::setOptions(qreal _speed, int _hp, int _attackBaseValue)
+void Unit::setOptions(int _speed, int _hp, int _attackBaseValue)
 {
   speed = _speed;
   maxHP = _hp;
@@ -53,8 +54,18 @@ void Unit::moveTo(QPointF point) {
 
 void Unit::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-
+  interfaces[5]->typeOfEntity = type;
+  interfaces[5]->update();
+  clicked = true;
+  Q_UNUSED(event)
 }
+
+void Unit::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+  clicked = false;
+  Q_UNUSED(event)
+}
+
 ////////////////////////////Graphics/////////////////////////
 QRectF Unit::boundingRect() const
 {
@@ -82,7 +93,7 @@ void Unit::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
       painter->setTransform(transf);
     }
     spriteImage = new QPixmap("../TowerDefense/images/enemy.png");
-    painter->drawPixmap(boundingRect(), *spriteImage, QRectF(QPointF(0,0),QPointF(200,200)));
+    painter->drawPixmap(boundingRect(), *spriteImage, spriteImage->rect());
 
 //    painter->drawPolygon(polygon);
     Q_UNUSED(option)

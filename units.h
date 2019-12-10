@@ -7,17 +7,18 @@
 #include <QGraphicsScene>
 #include <QPainter>
 #include <queue>
-
 #include <QGraphicsSceneMouseEvent>
 #include <QTimer>
+
+#include "interface.h"
 //#include <QRandomGenerator>
 class Unit : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Unit(QObject *parent, QPointF _start, int _startPos, QString type, QVector<QVector<QPointF> > _path);
+    explicit Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVector<QVector<QPointF> > _path, QVector<Interface *> _interfaces);
     ~Unit();
-    void setOptions(qreal _speed, int _hp, int _attackBaseValue);
+    void setOptions(int _speed, int _hp, int _attackBaseValue);
     void moveTo(QPointF point);
     int startPos;
     int currentPos;
@@ -27,27 +28,27 @@ public:
     int cooldown;
     int maxHP;
     int hp;
+    int speed;
     int attackBaseValue;
     bool isBlocked;
 
     int goldValue;
+    bool clicked = false;
 
-
-
+    QString type;
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 //public slots:
 //    void completePath();
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 private:
-   // QGraphicsItem *item;
+    QVector<Interface *> interfaces;
 //    int offset;
     int dx = 0;
-    qreal speed;
     QPixmap *spriteImage;
     QVector<QVector<QPointF> > path;
-    QString type;
 };
 
 #endif // UNITS_H
