@@ -33,25 +33,33 @@ public:
 
     void addInterface();
 
-    void addTile(QPointF pos1, QPointF pos2, QString type);
+    void addTile(QPointF pos1, QPointF pos2, QString type, int rotation);
     void addUnit(QPointF _start, int startPos, QString type);
-    void addTower(QPointF pos1, QPointF pos2, QString type, qreal radius, int price);
+    void addTower(QPointF pos1, QPointF pos2, QString type, int price);
 
     void makeWavePath();
 
 //    QGraphicsItem* getItem(size_t x, size_t y); // зачем?
 
     int currentWave = 0;
+    int waveCounter = 1;
     int startingPoint = 0;
-    bool selectingTower = false;
+    bool buildingTower = false;
     QString selectedTower;
     int indexOfSelectedTower;
     int playerMoney;
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
-
+    QVector<Interface*> interfaces;
+signals:
+    void showUpgradeButton();
+    void hideUpgradeButton();
+    void showRouteButton();
+    void hideRouteButton();
 public slots:
   void gameTimerSlot();
-  void spawnUnit();
+  void spawnUnitSlot();
+  void upgradeCurrentTowerSlot();
+  void changeRouteSlot();
 private:
     std::vector<std::vector<QString> > map;
 
@@ -59,6 +67,8 @@ private:
     size_t width;     // число столбиков
     QVector<QPointF> start;
     QPointF end;
+    bool changingRoutePointScene = false;
+    QPointF routePoint;
     QString backgroundTheme;
     QVector<QVector<QPointF> > path;
 
@@ -66,7 +76,6 @@ private:
     QVector<Unit*>  units;
     QVector<Tower*> towers;
     int playerHP = 20;
-    QVector<Interface*> interfaces;
 };
 
 

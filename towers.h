@@ -29,12 +29,16 @@ class Tower : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, qreal _radius, int _price, QVector<Unit*> _units, QVector<Interface *> _interfaces);
+    explicit Tower(QObject *parent, QPointF _pos1, QPointF _pos2, QString _type, int _price, int _index, QVector<Unit*> _units, QVector<Interface *> _interfaces);
     ~Tower() {}
+    void setOptions();
 
-    void showRadius();
-    void buyTower();
-    void sellTower();
+//    void showRadius();
+//    void buyTower();
+//    void sellTower();
+    void upgradeTower();
+    void changeRouteTower(QPointF _routePoint);
+
 
     void updateUnits(QVector<Unit*> _units);
     qreal distanceTo(QGraphicsItem *item);
@@ -44,10 +48,11 @@ public:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-
+    int level = 1;
     int price;
-
+    int index;
     int damage;
+    QGraphicsEllipseItem * attackArea;
 public slots:
     void acquireTarget();
     void spawnNPC();
@@ -58,16 +63,21 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr);
 private:
     QPointF pos1, pos2;
+    QPointF routePoint;
     QVector<Unit*> units;
     QVector<FriendlyNPC *> npcs;
     QVector<Interface *> interfaces;
     QString type;
     qreal attackRadius;
+    qreal initialRadius;
     bool onCooldown;
     int reloadSpeed;
     int reloading;
     bool hasTarget;
 
+    // npc
+    //(this->npcs[0]->maxHP, this->npcs[0]->damage, 0, 0, this->npcs[0]->coolDown, 0, this->price)
+    int maxHP, coolDown;
     int numberOfNPCs;
     int respawnTimer;
     int respawning;
@@ -80,7 +90,6 @@ private:
 //    QTimer *attackTimer;
 
     QPointF attackDest;
-    QGraphicsEllipseItem * attackArea;
     QPixmap *spriteImage;
 };
 

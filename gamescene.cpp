@@ -15,54 +15,124 @@ void GameScene::fillMap(size_t _width, std::vector<std::vector<QString> > p) {
     width =  _width;
 }
 
-void GameScene::createMap(QString _backgroundTheme) {
+void GameScene::createMap(QString _backgroundTheme) { // такого ужасного кода я ещё никогда не писал .-.
   backgroundTheme = _backgroundTheme;
   QString type;
-  int rotation;
+  int rotation = 0;
   this->setSceneRect(QRectF(QPointF(-square,-square),QPointF(square,square)));
-  for (size_t i = 0; i < height; i++) // потом поменять на int
-    for (size_t j = 0; j < width; j++) {
-        QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
+  for (size_t i = 1; i < height-1; i++) // потом поменять на int
+    for (size_t j = 1; j < width-1; j++) {
+        QPointF pos1(-square/2*width +  j*square, -square/2*height+i*square),
                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
+        rotation = 0;
         type = "/layers/";
         if (map[i][j] == "b")
           type += "dot.png";
         else
         if (map[i][j] == "r") {
             type += "road_";
-            if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i][j+1] == 'r')
-              type += "5.png";
+//            if (map[i][j] == "e" && (map[i][j-1] == "r" || map[i][j+1] == "r"))
+//              type += "5.png";
+//            else
+            if (map[i][j-1] == 'r' && map[i][j+1] == 'r' && map[i-1][j] == 'r' && map[i+1][j] == 'r')
+              type += "9.png";
             else
-            if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i-1][j] == 'r' && map[i+1][j] == 'r')
-              type += "6.png";
+            if (map[i][j-1] == 'r' && map[i][j+1] == 'r') {
+              if (map[i-1][j] == 'r') {
+                    type += "8.png";
+                    rotation = 180;
+                  } else
+                      if (map[i+1][j] == 'r') {
+                        type += "8.png";
+//                      rotation = 0;
+                      } else
+                        type += "5.png";
+            } else
+            if (map[i-1][j] == 'r' && map[i+1][j] == 'r') {
+              if (map[i][j-1] == 'r') {
+                    type += "8.png";
+                  rotation = 90;
+                } else
+                      if (map[i][j+1] == 'r') {
+                        type += "8.png";
+                      rotation = -90;
+                      } else
+                        type += "6.png";
+            } else
+            if (map[i][j+1] == 'r' && map[i+1][j] == 'r') {
+              type += "1.png";
+              rotation = 0;
+            } else
+            if (map[i][j-1] == 'r' && map[i+1][j] == 'r') {
+              type += "1.png";
+              rotation = 90;
+            } else
+            if (map[i][j+1] == 'r' && map[i-1][j] == 'r') {
+              type += "1.png";
+              rotation = -90;
+            } else
+            if (map[i][j-1] == 'r' && map[i-1][j] == 'r') {
+              type += "1.png";
+              rotation = 180;
+            }
+//            } else
           }
 
-        this->addTile(pos1, pos2, type);
-    }
-  // turn tiles
+        this->addTile(pos1, pos2, type, rotation);
+  }
+  rotation = 0;
   for (size_t i = 0; i < height; i++) {
-      for (size_t j = 0; j < width; j++) {
-          if (map[i][j] == "r") {
-            QPointF pos1(-square/2*width+j*square, -square/2*height+i*square),
-                    pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
-            type = "/layers/road_";
-          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j+1] == 'r' && map[i+1][j] == 'r')
-            type += "1.png";
-          else
-          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i+1][j] == 'r')
-            type += "2.png";
-          else
-          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j+1] == 'r' && map[i-1][j] == 'r')
-            type += "3.png";
-          else
-          if (i > 0 && j > 0 && i < height - 1  && j < width - 1 && map[i][j-1] == 'r' && map[i-1][j] == 'r')
-            type += "4.png";
-          this->addTile(pos1, pos2, type);
-          }
+    if (map[i][0] == "r") {
+        QPointF pos1(-square/2*width, -square/2*height+i*square),
+                pos2(-square/2*(width-2),-square/2*(height-2)+i*square);
+          type = "/layers/road_5.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[i][width-1] == "r") {
+        QPointF pos1(-square/2*width +(width-1)*square, -square/2*height+i*square),
+                pos2(-square/2*(width-2) +(width-1)*square,-square/2*(height-2)+i*square);
+        type = "/layers/road_5.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[i][0] == "b") {
+        QPointF pos1(-square/2*width, -square/2*height+i*square),
+                pos2(-square/2*(width-2),-square/2*(height-2)+i*square);
+        type = "/layers/dot.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[i][width-1] == "b") {
+        QPointF pos1(-square/2*width +(width-1)*square, -square/2*height+i*square),
+                pos2(-square/2*(width-2) +(width-1)*square,-square/2*(height-2)+i*square);
+        type = "/layers/dot.png";
+        this->addTile(pos1, pos2, type, rotation);
     }
   }
-
-
+  for (size_t j = 0; j < width; j++) {
+    if (map[0][j] == "r") {
+        QPointF pos1(-square/2*width + j*square, -square/2*height),
+                pos2(-square/2*(width-2) + j*square,-square/2*(height-2));
+          type = "/layers/road_6.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[height-1][j] == "r") {
+        QPointF pos1(-square/2*width + j*square, -square/2*height+(height-1)*square),
+                pos2(-square/2*(width-2) + j*square,-square/2*(height-2)+(height-1)*square);
+        type = "/layers/road_6.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[0][j] == "b") {
+        QPointF pos1(-square/2*width + j*square, -square/2*height),
+                pos2(-square/2*(width-2) + j*square,-square/2*(height-2));
+        type = "/layers/dot.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+    if (map[height-1][j] == "b") {
+        QPointF pos1(-square/2*width + j*square, -square/2*height+(height-1)*square),
+                pos2(-square/2*(width-2) + j*square,-square/2*(height-2)+(height-1)*square);
+        type = "/layers/dot.png";
+        this->addTile(pos1, pos2, type, rotation);
+    }
+  }
 
  // Background Texture
   QString path;
@@ -89,6 +159,9 @@ void GameScene::setGameOptions(QVector<QVector<size_t> > _number, int _playerMon
           end = QPointF(-square/2*(width-1) +j*square,-square/2*(height-1) +i*square);
 //          getItem(j,i)->setOpacity(0.2);
           map[i][j] = "r";
+          QPointF pos1(-square/2*width +j*square, -square/2*height+i*square),
+                  pos2(-square/2*(width-2) +j*square,-square/2*(height-2)+i*square);
+          addTile(pos1, pos2, "/layers/dot.png", 0);
       }
     }
   playerMoney = _playerMoney;
@@ -108,7 +181,7 @@ void GameScene::addInterface() {
     // Rapid // mage or artillery or superarcher
         pos1 = QPointF(square*(width+1)/2, -square*(height)/2+1*square);
         pos2 = QPointF(square*(width+10)/2,-square*(height)/2+(1+1)*square);
-        interface = new Interface(this, pos1, pos2, "Rapid");
+        interface = new Interface(this, pos1, pos2, "Artillery");
         this->addItem(interface);
         interfaces.push_back(interface);
     // Archer or artillery
@@ -134,7 +207,7 @@ void GameScene::addInterface() {
     pos1 = QPointF(square*(width+1)/2, -square*(height)/2+6*square);
     pos2 = QPointF(square*(width+10)/2,square*(height)/2);
     interface = new Interface(this, pos1, pos2, "Info");
-    interface->addGameInfo(this->playerHP, currentWave, playerMoney);
+    interface->addGameInfo(this->playerHP, waveCounter, playerMoney);
     this->addItem(interface);
     interfaces.push_back(interface);
 
@@ -157,30 +230,27 @@ void GameScene::addInterface() {
 
 
 
-void GameScene::addTile(QPointF pos1, QPointF pos2, QString type) {
-  Tile *tile = new Tile(this, pos1, pos2, backgroundTheme, type);
+void GameScene::addTile(QPointF pos1, QPointF pos2, QString type, int rotation) {
+  Tile *tile = new Tile(this, pos1, pos2, backgroundTheme, type, rotation);
   this->addItem(tile);
-
 }
 
 void GameScene::addUnit(QPointF _start, int _startPos, QString type) {
   Unit *unit = new Unit(this, _start, _startPos, type, path, interfaces);
-  int speed = 1;
-  unit->setOptions(speed, 10, 1); // speed/hp/attackPower
   this->addItem(unit);
   units.push_back(unit);
   for (int i = 0; i < towers.size(); i++)
       towers[i]->updateUnits(units);
 }
 
-void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius, int price) {
+void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, int price) {
   QTransform trans;
   QList<QGraphicsItem*> items = this->items((pos1+pos2)/2);
   Tile *tile = nullptr;
   for (int i = 0; i < items.size(); i++)
-    tile= static_cast<Tile*>(items[i]);
+    tile = static_cast<Tile*>(items[i]);
   if (!tile->hasTower) {
-    Tower *tower = new Tower(this, pos1, pos2, type, radius, price, units, interfaces);
+    Tower *tower = new Tower(this, pos1, pos2, type, price, towers.size(), units, interfaces);
 
     if (type == "Support") {
         std::thread([tower]()
@@ -207,7 +277,7 @@ void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius,
         }
         ).detach();
     }
-
+    playerMoney -= interfaces[indexOfSelectedTower]->price;
     this->addItem(tower);
     towers.push_back(tower);
     tile->hasTower = true;
@@ -218,14 +288,14 @@ void GameScene::addTower(QPointF pos1, QPointF pos2, QString type, qreal radius,
 }
 
 
-void GameScene::spawnUnit() {
+void GameScene::spawnUnitSlot() {
   if (playerHP != 0) {
     if (numberOfUnitsToSpawn[numberOfUnitsToSpawn.size()-1][numberOfUnitsToSpawn[numberOfUnitsToSpawn.size()-1].size()-1] == 0 && units.size() == 0) {
         this->addText("victory",QFont("Comic Sans MS", 40,-1,false));
         return;
     }
     if (currentWave < numberOfUnitsToSpawn[startingPoint].size() && numberOfUnitsToSpawn[startingPoint][currentWave] != 0) {
-        interfaces[5]->addGameInfo(this->playerHP, 0/*startingPoint*currentWave+1*/, this->playerMoney);
+        interfaces[5]->addGameInfo(this->playerHP, waveCounter, this->playerMoney);
         interfaces[5]->update();
         QString type = "default";
          this->addUnit(path[startingPoint][0], startingPoint, type);
@@ -233,6 +303,10 @@ void GameScene::spawnUnit() {
     } else {
          if (currentWave < numberOfUnitsToSpawn[startingPoint].size() && units.size() == 0) {
              currentWave++;
+             int bonusIncome = playerMoney / 100;
+             playerMoney += bonusIncome*10;
+//             playerMoney /= 100;
+             waveCounter++;
              if (currentWave == numberOfUnitsToSpawn[startingPoint].size() && startingPoint + 1 < numberOfUnitsToSpawn.size()) {
                 startingPoint++;
                 currentWave = 0;
@@ -243,10 +317,41 @@ void GameScene::spawnUnit() {
     }
 }
 
+void GameScene::upgradeCurrentTowerSlot()
+{
+//  interfaces[5]->typeOfEntity = "Tower";
+//  selectedTower = interfaces[i]->typeOfTower;
+//  indexOfSelectedTower = i;
+//  interfaces[5]->typeOfTower = selectedTower;
+    int index = interfaces[5]->currentTowerIndex;
+    int price = towers[index]->price;
+
+    if (playerMoney > price && towers[index]->level < 4) {
+      playerMoney -= price;
+    //  towers[index]->upgradeTower();
+      interfaces[5]->typeOfEntity = "default";
+//      interfaces[5]->level = towers[index]->level;
+      interfaces[5]->playerMoney = playerMoney;
+      interfaces[5]->update();
+      towers[index]->upgradeTower();
+//        towers[indexOfSelectedTower];
+      interfaces[4]->showingUpgradeButton = false;
+      interfaces[4]->showingRouteButton = false;
+      interfaces[4]->update();
+   }
+
+}
+
+void GameScene::changeRouteSlot()
+{
+    changingRoutePointScene = true;
+    towers[interfaces[5]->currentTowerIndex]->attackArea->show();
+
+}
+
 void GameScene::gameTimerSlot() {
    if (playerHP != 0) {
 //       this->addText(QString::number(this->playerHP),QFont("Comic Sans MS", 40,-1,false));
-
 
        QString selectedUnit;
        for (int i = 0; i < units.size(); i++)
@@ -261,18 +366,29 @@ void GameScene::gameTimerSlot() {
 
        for (int i = 0; i < 4; i++) {
            if (interfaces[i]->selectingMode) {
-             selectingTower = true;
+             buildingTower = true;
+             interfaces[5]->selectingMode = true;
              interfaces[5]->typeOfEntity = "Tower";
+             interfaces[5]->level = 1;
              selectedTower = interfaces[i]->typeOfTower;
              indexOfSelectedTower = i;
              interfaces[5]->typeOfTower = selectedTower;
              interfaces[5]->entityInfo(interfaces[i]->hp, interfaces[i]->dmg, 0, interfaces[i]->radius, interfaces[i]->attackSpeed, 0, interfaces[i]->price);
              interfaces[5]->update();
              break;
-          }/*
-          else
-             selectingTower = false;*/
-         }
+          }
+        }
+       if (interfaces[4]->showingUpgradeButton && towers[interfaces[5]->currentTowerIndex]->level != 3) {
+         emit showUpgradeButton();
+       }
+       else {
+         interfaces[4]->showingUpgradeButton = false;
+         emit hideUpgradeButton();
+       }
+       if (interfaces[4]->showingRouteButton)
+         emit showRouteButton();
+       else
+         emit hideRouteButton();
     for(int k = 0; k < start.size(); k++) {
         for (int i = 0; i < units.size(); i++) {
             if(units[i]->startPos == k) {
@@ -286,8 +402,8 @@ void GameScene::gameTimerSlot() {
                     if (units[i]->pos() == end)
                       playerHP -= units[i]->attackBaseValue;
                     if (units[i]->hp <= 0)
-                      playerMoney += 10;
-                    interfaces[5]->addGameInfo(this->playerHP, 0, this->playerMoney);
+                      playerMoney += units[i]->income;
+                    interfaces[5]->addGameInfo(this->playerHP, waveCounter, this->playerMoney);
                     interfaces[5]->update();
                     int index = i;
                     units[i]->~Unit();
@@ -321,8 +437,15 @@ void GameScene::gameTimerSlot() {
 void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if(playerHP != 0) { // Если игрок ещё не проиграл
     // Выбрать башню для постройки
-
-
+    if (changingRoutePointScene) {
+//        int i = mouseEvent->scenePos().x()/square + height/2,
+//            j = mouseEvent->scenePos().y()/square + width/2;
+//         if (map[i][j] == "r") {
+            towers[interfaces[5]->currentTowerIndex]->changeRouteTower(mouseEvent->scenePos());
+            changingRoutePointScene = false;
+            towers[interfaces[5]->currentTowerIndex]->attackArea->hide();
+//           }
+    }
     // Выбрать определенный тайл
     for (size_t i = 0; i < height; i++)
         for (size_t j = 0; j < width; j++) {
@@ -331,11 +454,18 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
                                 pos2(-square/2*(width-2)+j*square,-square/2*(height-2)+i*square);
                         if (mouseEvent->scenePos().x() >= pos1.x() && mouseEvent->scenePos().x() <= pos2.x() &&
                             mouseEvent->scenePos().y() >= pos1.y() && mouseEvent->scenePos().y() <= pos2.y()) {
-
-                            if (selectingTower && map[i][j] == 'b' && playerMoney >= interfaces[indexOfSelectedTower]->price) {
-                                addTower(pos1,pos2, selectedTower, 3, interfaces[indexOfSelectedTower]->price);
-                                playerMoney -= interfaces[indexOfSelectedTower]->price;
-                                selectingTower = false;
+                            if (interfaces[4]->showingUpgradeButton) {
+                              interfaces[4]->showingUpgradeButton = false;
+                              interfaces[4]->update();
+                              }
+                            if (interfaces[4]->showingRouteButton) {
+                              interfaces[4]->showingRouteButton = false;
+                              interfaces[4]->update();
+                              }
+                            if (buildingTower && map[i][j] == 'b' && playerMoney >= interfaces[indexOfSelectedTower]->price) {
+                                addTower(pos1,pos2, selectedTower, interfaces[indexOfSelectedTower]->price);
+                                buildingTower = false;
+                                interfaces[5]->selectingMode = false;
                             }
                                 interfaces[5]->typeOfEntity = "default";
                                 interfaces[5]->playerMoney = playerMoney;

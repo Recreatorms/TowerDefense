@@ -10,10 +10,16 @@ Unit::Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVecto
     path = _path;
     setPos(_start);
     isBlocked = false;
+
     type = "enemy";
     damage = 1;
+    maxHP = 6;
+    hp = maxHP;
+    attackBaseValue = 1;
+    speed = 1;
     cooldown = 100;
-//    QTimer *pathTimer = new QTimer();
+    income = 10;
+    //    QTimer *pathTimer = new QTimer();
 //    pathTimer->start(1);
 //    connect(pathTimer, &QTimer::timeout, this, &Unit::completePath);
 }
@@ -21,14 +27,6 @@ Unit::Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVecto
 Unit::~Unit(){
 }
 
-void Unit::setOptions(int _speed, int _hp, int _attackBaseValue)
-{
-  speed = _speed;
-  maxHP = _hp;
-  hp = _hp;
-  attackBaseValue = _attackBaseValue;
-
-}
 
 void Unit::moveTo(QPointF point) {
   this->reloading++;

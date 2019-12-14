@@ -37,10 +37,12 @@ MainWindow::MainWindow(QWidget *parent)
   gameScene->fillMap(width, p);
   QVector<QVector<size_t> > numberOfUnitsToSpawn =
   {
-       {1},
+       {100},
        {10, 10, 10},
        {20}
   };
+
+
   QString backgroundTheme = "1";
   // теперь можно заполнить двумерный массив (вектор векторов)
   int _playerMoney = 500;
@@ -48,17 +50,30 @@ MainWindow::MainWindow(QWidget *parent)
   gameScene->createMap(backgroundTheme); // и отрисовать карту с n*m тайлами(квадратами) причём каждый тайл является отдельным item'ом
   gameScene->addInterface();
   gameScene->makeWavePath();
-  QPushButton *changeRoute = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")),"", this);
-  timer = new QTimer(); // почти самая важная штука, иначе ничего не будет происходить
-  connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
-  timer->start(1000/120); // это важно
-  connect(changeRoute, &QPushButton::clicked, this, &MainWindow::launch);
-//  QThreadPool pool;
-//  QPointF _start;
-//  int startPos;
-//  QString type;
-//  QFuture<void> future = QtConcurrent::run(&pool, addUnit, _start, startPos, type);
 
+  QPushButton *launchWave = new QPushButton(QIcon(QPixmap("../TowerDefense/images/change_route.png")), "Launch", ui->graphicsView);
+  launchWave->setGeometry(100,100,100,100);
+
+  QIcon icon(QPixmap("../TowerDefense/images/4.png"));
+  QPushButton *upgradeButton = new QPushButton(icon, "Upgrade", ui->graphicsView);
+  connect(gameScene, &GameScene::showUpgradeButton, upgradeButton, &QPushButton::show);
+  connect(gameScene, &GameScene::hideUpgradeButton, upgradeButton, &QPushButton::hide);
+  connect(upgradeButton, &QPushButton::clicked, gameScene, &GameScene::upgradeCurrentTowerSlot);
+  QPointF pos1(square*(width+1)/2, -square*(p.size())/2+4*square),
+          pos2(square*(width+10)/2,-square*(p.size())/2+6*square);
+  upgradeButton->setGeometry(/*gameScene->interfaces[4]->x()+pos1.x(), gameScene->interfaces[4]->x()+ pos2.y()*/1450, 480, 100, 100);
+
+  QPushButton *changeRouteButton = new QPushButton(icon, "Change Route", ui->graphicsView);
+  connect(gameScene, &GameScene::showRouteButton, changeRouteButton, &QPushButton::show);
+  connect(gameScene, &GameScene::hideRouteButton, changeRouteButton, &QPushButton::hide);
+  connect(changeRouteButton, &QPushButton::clicked, gameScene, &GameScene::changeRouteSlot);
+  changeRouteButton->setGeometry(1600, 480, 100,100);
+
+
+
+  timer = new QTimer();
+  connect(timer, &QTimer::timeout, gameScene, &GameScene::gameTimerSlot);
+  timer->start(1000/120);   connect(launchWave, &QPushButton::clicked, this, &MainWindow::launch);
 }
 
 MainWindow::~MainWindow()
@@ -70,7 +85,7 @@ void MainWindow::launch()
 {
     if (!launched) {
         spawnTimer = new QTimer();
-        connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnit);
+        connect(spawnTimer, &QTimer::timeout, gameScene, &GameScene::spawnUnitSlot);
         spawnTimer->start(1000);
         launched = true;
     } else {

@@ -11,7 +11,7 @@ class Tile: public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Tile(QObject *parent, QPointF pos1, QPointF pos2, QString _backgroundTheme, QString _type);
+    explicit Tile(QObject *parent, QPointF pos1, QPointF pos2, QString _backgroundTheme, QString _type, int rotation);
     ~Tile();
     QString type;
     bool hasTower = false;

@@ -1,6 +1,6 @@
 #include "friendlynpc.h"
 
-FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units, QVector<Interface *> _interfaces) :
+FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QVector<Unit*> _units, QVector<Interface *> _interfaces, int _level) :
     QObject(parent), QGraphicsItem()
 {
     spawnPoint = _spawnPoint;
@@ -12,38 +12,31 @@ FriendlyNPC::FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoi
     readyToStrike = false;
     interfaces = _interfaces;
     //if (type == ...) {
-      maxHP = 12;
-      hp = maxHP;
-      regenSpeed = 3000;
-
-      reloading = 0;
-      checkRadius = 101;
-      damage = 1;
-      coolDown = 250;
-
-
+    level = _level;
+    updateStats();
 //    checkingTimer = new QTimer();
 //    checkingTimer->start(100);
 //    connect(checkingTimer, &QTimer::timeout, this, &FriendlyNPC::checkForEnemies);
 }
 
 void FriendlyNPC::moveTo(QPointF pos) {
-    qreal Vo = 0.25;
     QLineF distance(this->pos(), pos);
     qreal alpha = -distance.angle();
-    dx = Vo * qCos(qDegreesToRadians(alpha));
-    dy = Vo * qSin(qDegreesToRadians(alpha));
+    dx = movementSpeed * qCos(qDegreesToRadians(alpha));
+    dy = movementSpeed * qSin(qDegreesToRadians(alpha));
     setPos(x() + dx, y() + dy);
 
-    if (distance.length() <= 1)
+    if (distance.length() <= 1) {
       readyToStrike = true;
+      changingRoute = false;
+    }
 }
 
 void FriendlyNPC::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
   interfaces[5]->typeOfEntity = "Unit";
   interfaces[5]->typeOfUnit = "Friendly";
-  interfaces[5]->entityInfo(this->hp, this->damage, 0, 0, this->coolDown, 0, 0);
+  interfaces[5]->entityInfo(this->hp, this->damage, 0, 0.0, this->coolDown, 0, 0);
   interfaces[5]->update();
   clicked = true;
   Q_UNUSED(event)
@@ -58,16 +51,19 @@ void FriendlyNPC::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void FriendlyNPC::attackEnemy(Unit* enemy) {
       if (enemy == nullptr) {
-          readyToStrike = false;
+          readyToStrike = true;
           moveTo(routePoint);
+
           return;
-        }
+      }
       enemy->isBlocked = true;
       QLineF distance(pos(), enemy->pos());
       if (distance.length() >= 10) {
+        movementSpeed = 0.5;
         this->moveTo(enemy->pos());
         return;
-      }
+
+        }
       if (reloading == coolDown) {
         enemy->hp -= this->damage;
         reloading = 0;
@@ -86,32 +82,62 @@ void FriendlyNPC::attackEnemy(Unit* enemy) {
       if (enemy->hp <= 0) {
         readyToStrike = false;
         currentEnemy = nullptr;
+
       }
-//        blockingAnEnemy = false;
-//        if (collidingUnits.indexOf(enemy) == collidingUnits.size() - 1)
-//          collidingUnits.pop_back();
-//        else {
-//          if (collidingUnits.size() > 1) {
-//            for (int j = collidingUnits.indexOf(enemy); j < collidingUnits.size()-1; j++)
-//              collidingUnits[j] = collidingUnits[j+1];
-//            collidingUnits[collidingUnits.size()-2] = collidingUnits[collidingUnits.size()-1];
-//            collidingUnits.pop_back();
-//          } else
-//            collidingUnits.pop_back();
-//        }
-//    enemy->blocked = true;
-//    enemy->hp -=damage;
-//    if (enemy->cooldown == enemy->attackSpeed) {
-//        this->hp -=enemy->attackBaseValue;
-//        enemy->cooldown = 0;
-//    }
 }
 
 void FriendlyNPC::updateUnits(QVector<Unit *> _units) {
     units = _units;
+    this->update();
+}
+
+void FriendlyNPC::updateStats()
+{
+  switch (level) {
+    case 1: {
+        maxHP = 5;
+        hp = maxHP;
+        regenSpeed = 3000;
+        regenerating = 0;
+        reloading = 0;
+        checkRadius = 101;
+        damage = 1;
+        coolDown = 250;
+        break;
+    }
+    case 2: {
+        maxHP = 10;
+        hp = maxHP;
+        regenSpeed = 3000;
+        regenerating = 0;
+        reloading = 0;
+        checkRadius = 101;
+        damage = 2;
+        coolDown = 250;
+        break;
+      }
+    case 3: {
+        maxHP = 15;
+        hp = maxHP;
+        regenSpeed = 3000;
+        regenerating = 0;
+        reloading = 0;
+        checkRadius = 101;
+        damage = 3;
+        coolDown = 250;
+        break;
+      }
+  }
+  this->update();
 }
 
 void FriendlyNPC::checkForEnemies() {
+    if (changingRoute) {
+      moveTo(routePoint);
+//      movementSpeed = 0.5;
+    }
+    else {
+    movementSpeed = 0.33;
     if (!readyToStrike)
       moveTo(routePoint);
     else {
@@ -139,40 +165,8 @@ void FriendlyNPC::checkForEnemies() {
           break;
         }
       }
-          //            collidingUnits.push_back(units[i]);
-//        else {
-//            if (line.length() > checkRadius && collidingUnits.contains(units[i])) {
-//                if (collidingUnits.indexOf(units[i]) == collidingUnits.size() - 1)
-//                  collidingUnits.pop_back();
-//                else {
-//                  if (collidingUnits.size() > 1) {
-//                    for (int j = collidingUnits.indexOf(units[i]); j < collidingUnits.size()-1; j++)
-//                      collidingUnits[j] = collidingUnits[j+1];
-//                    collidingUnits[collidingUnits.size()-2] = collidingUnits[collidingUnits.size()-1];
-//                    collidingUnits.pop_back();
-//                  } else
-//                    collidingUnits.pop_back();
-//                }
-//             }
-//          }
-
-
-//      else {
-//        qreal closestDist = checkRadius;
-////        for (int i = 0; i < collidingUnits.size(); i++) {
-////            QLineF distance(routePoint,collidingUnits[i]->pos());
-////            qreal thisDist = distance.length();
-////            if (thisDist < closestDist) {
-////                closestDist = thisDist;
-////                currentEnemy = i;
-//                blockingAnEnemy = true;
-////            }
-//        }
-//      }
-//      if (blockingAnEnemy) {
-//        attackEnemy(currentEnemy);
-//      }
     }
+   }
 }
 ////////////////////////Graphics/////////////////////
 QRectF FriendlyNPC::boundingRect() const
@@ -182,7 +176,7 @@ QRectF FriendlyNPC::boundingRect() const
 
 void FriendlyNPC::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    spriteImage = new QPixmap("../TowerDefense/images/Towers/Support/knight.png");
+    spriteImage = new QPixmap("../TowerDefense/images/Towers/Support/knight_" + QString::number(level) + ".png");
     // HP bar
     QPen pen;
     pen.setWidth(10);

@@ -18,7 +18,6 @@ class Unit : public QObject, public QGraphicsItem
 public:
     explicit Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVector<QVector<QPointF> > _path, QVector<Interface *> _interfaces);
     ~Unit();
-    void setOptions(int _speed, int _hp, int _attackBaseValue);
     void moveTo(QPointF point);
     int startPos;
     int currentPos;
@@ -32,7 +31,7 @@ public:
     int attackBaseValue;
     bool isBlocked;
 
-    int goldValue;
+    int income;
     bool clicked = false;
 
     QString type;

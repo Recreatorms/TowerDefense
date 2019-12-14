@@ -3,11 +3,12 @@
 
 #include <QObject>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsEllipseItem>
 #include <QGraphicsItem>
 #include "units.h"
 #include "tile.h"
-#include <QTimer>
-#include <QThread>
+//#include <QTimer>
+//#include <QThread>
 class Bullet : public QObject, public QGraphicsPixmapItem
 {
   Q_OBJECT
@@ -15,16 +16,18 @@ public:
   Bullet(QObject * parent, QPointF _originPos, QPointF _destination, /*QVector<Unit*> _units,*/ QString _type, qreal _radiusOfTower, int _damage);
   ~Bullet() {}
   int launchTime;
+  void updateUnits(QVector<Unit*> &_units);
 public slots:
   void move();
 private:
+  QVector<Unit*> units;
   bool canDealDamage = true;
 //  QTimer *moveTimer;
   QPointF originPos;
   QPointF destination;
 
 //  QVector<Unit*> units;
-
+  int radiusOfExplosion = 100;
   QString type;
   qreal radiusOfTower;
   int damage;

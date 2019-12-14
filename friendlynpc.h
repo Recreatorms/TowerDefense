@@ -16,22 +16,25 @@ class FriendlyNPC : public QObject, public QGraphicsItem
 {
     Q_OBJECT
 public:
-    explicit FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QString _type, QVector<Unit*> _units, QVector<Interface *> _interfaces);
+    explicit FriendlyNPC(QObject *parent, QPointF _spawnPoint, QPointF _routePoint, QVector<Unit*> _units, QVector<Interface *> _interfaces, int _level);
     ~FriendlyNPC() {}
 
     void attackEnemy(Unit* enemy);
 
     void updateUnits(QVector<Unit *> _units);
-
+    void updateStats();
     void moveTo(QPointF pos);
 
     bool blockingAnEnemy;
-
+    int level;
     int damage;
     int coolDown;
     int maxHP;
     int hp;
     bool clicked = false;
+
+    bool changingRoute = false;
+    QPointF routePoint;
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -43,13 +46,12 @@ protected:
 
 private:
     bool readyToStrike;
-    QPointF routePoint;
     QPointF spawnPoint;
     QString type;
-
+    qreal movementSpeed;
     int hpRegen = 1;
     int regenSpeed;
-    int regenerating = 0;
+    int regenerating;
     int reloading;
     int checkRadius;
 
