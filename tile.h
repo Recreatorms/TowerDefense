@@ -16,14 +16,14 @@ public:
     QString type;
     bool hasTower = false;
     bool towerSelected = false;
+    QPointF pos1, pos2;
 protected:
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
 private:
     QString backgroundTheme;
-    QPixmap *spriteImage;
-    QPointF pos1, pos2;
+    QPixmap spriteImage;
 };
 
 #endif // TILE_H

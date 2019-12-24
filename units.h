@@ -12,42 +12,50 @@
 
 #include "interface.h"
 //#include <QRandomGenerator>
+
 class Unit : public QObject, public QGraphicsItem
 {
    Q_OBJECT
 public:
-    explicit Unit(QObject *parent, QPointF _start, int _startPos, QString _type, QVector<QVector<QPointF> > _path, QVector<Interface *> _interfaces);
+    explicit Unit(QObject *parent, int _startPos, QString _type, QVector<QPointF>  &_path, QVector<Interface *>& _interfaces);
     ~Unit();
+
     void moveTo(QPointF point);
     int startPos;
-    int currentPos;
+    int currentPos = 0;
 
     int damage;
     int reloading = 0;
     int cooldown;
+
     int maxHP;
     int hp;
-    int speed;
+    qreal initialSpeed;
     int attackBaseValue;
-    bool isBlocked;
 
+    bool isBlocked;
+    int currentFrame = 0;
+    bool slowedDown = false;
+    int slowingDown = 0;
+    int slowTimer;
+    bool deleted = false;
     int income;
     bool clicked = false;
-
-    QString type;
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    QVector<QPointF> &path;
+    qreal dx = 0;
 //public slots:
 //    void completePath();
 protected:
     QRectF boundingRect() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option = nullptr, QWidget *widget = nullptr);
 private:
-    QVector<Interface *> interfaces;
+    QVector<Interface *> &interfaces;
 //    int offset;
-    int dx = 0;
+    QString type;
+    qreal speed;
     QPixmap *spriteImage;
-    QVector<QVector<QPointF> > path;
 };
 
 #endif // UNITS_H

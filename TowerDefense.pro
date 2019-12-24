@@ -21,8 +21,8 @@ SOURCES += \
     gamescene.cpp \
     interface.cpp \
     main.cpp \
+    mainmenu.cpp \
     mainwindow.cpp \
-    mythread.cpp \
     tile.cpp \
     towers.cpp \
     units.cpp
@@ -32,12 +32,12 @@ HEADERS += \
     friendlynpc.h \
     gamescene.h \
     interface.h \
+    mainmenu.h \
     mainwindow.h \
     mythread.h \
     tile.h \
     towers.h \
-    units.h \
-    view.h
+    units.h
 
 FORMS += \
     mainwindow.ui
@@ -46,3 +46,5 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES +=

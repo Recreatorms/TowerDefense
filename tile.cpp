@@ -14,11 +14,14 @@ Tile::Tile(QObject *parent, QPointF _pos1, QPointF _pos2, QString _backgroundThe
     setPos(pos1);
     backgroundTheme = _backgroundTheme;
     type = _type;
+    spriteImage = QPixmap("../TowerDefense/images/Map/game_background_" + backgroundTheme + type);
+//    if (type != "/layers/dot.png")
+//      this->
 }
 
 Tile::~Tile()
 {
-
+//  delete spriteImage;
 }
 
 void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -27,6 +30,7 @@ void Tile::mousePressEvent(QGraphicsSceneMouseEvent *event)
       return;
     else if (towerSelected)
       hasTower = true;
+    Q_UNUSED(event)
 }
 
 QRectF Tile::boundingRect() const {
@@ -34,20 +38,11 @@ QRectF Tile::boundingRect() const {
 }
 
 void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    spriteImage = new QPixmap("../TowerDefense/images/Map/game_background_" + backgroundTheme + type);
-    if (type == "/layers/road_1.png") {
-        painter->drawPixmap(QRect(0,0,100,100), *spriteImage, spriteImage->rect());
-//        painter->setCompositionMode(QPainter::CompositionMode_DestinationOver);
-//        spriteImage = new QPixmap("../TowerDefense/images/Map/game_background_" + backgroundTheme + "/layers/road_6.png");
-//        painter->drawPixmap(QRectF(0,50,100,100), *spriteImage, spriteImage->rect());
-//        spriteImage = new QPixmap("../TowerDefense/images/Map/game_background_" + backgroundTheme + "/layers/road_5.png");
-//        painter->drawPixmap(QRectF(50,0,100,150), *spriteImage, spriteImage->rect());
-      }
-      else {
-        //if (type != "/layers/dot.png")
-           //  painter->setCompositionMode(QPainter::CompositionMode_DestinationOver);
-          painter->drawPixmap(QRectF(0,0,100,100), *spriteImage, spriteImage->rect());
-    }
+    if (type == "/layers/Base.png")
+        painter->drawPixmap(QRectF(-60,-110,210,210), spriteImage, spriteImage.rect());
+    else
+        painter->drawPixmap(QRect(0,0,100,100), spriteImage, spriteImage.rect());
+
     Q_UNUSED(option)
     Q_UNUSED(widget)
 }
